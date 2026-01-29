@@ -14,7 +14,96 @@ function syncStorage() {
     localStorage.setItem('myCategories', JSON.stringify(categories));
     localStorage.setItem('mySalesHistory', JSON.stringify(salesHistory));
 }
+window.onload = () => {
+    // 1. تحديث البيانات الأساسية
+    if (typeof updateCategoryDropdowns === "function") updateCategoryDropdowns();
+    if (typeof loadInventory === "function") loadInventory();
+    if (typeof applyAllFilters === "function") applyAllFilters();
+    
+    // 2. تشغيل الساعة (لو موجودة)
+    if (typeof updateWelcomeClock === "function") {
+        setInterval(updateWelcomeClock, 1000);
+    }
 
+    // 3. إظهار شاشة الدخول أو الترحيب بأمان
+    const loginOverlay = document.getElementById('main-login-overlay');
+    if (loginOverlay) {
+        if (!sessionStorage.getItem('mainAuth')) {
+            loginOverlay.style.display = 'flex';
+        } else {
+            loginOverlay.style.display = 'none';
+            showSection('welcome-section');
+        }
+    } else {
+        console.warn("تنبيه: عنصر main-login-overlay غير موجود في صفحة HTML");
+        showSection('welcome-section');
+    }
+};
+function updateGlobalCompanyName(newName) {
+    if (!newName) return;
+    
+    // 1. التغيير في التخزين
+    localStorage.setItem('company_name', newName);
+
+    // 2. التغيير في كل واجهات البرنامج (الجانبية والترحيبية)
+    const selectors = ['.invoice-company-name', '#display-company-name', '#sidebar-logo-name', '.brand h1'];
+    selectors.forEach(selector => {
+        document.querySelectorAll(selector).forEach(el => {
+            el.innerText = newName;
+        });
+    });
+}
+function saveCompanyName() {
+    const newName = document.getElementById('new-company-name').value.trim();
+    
+    if (newName === "") {
+        alert("يرجى إدخال اسم الشركة أولاً");
+        return;
+    }
+
+    // 1. حفظ الاسم في الذاكرة الدائمة
+    localStorage.setItem('company_name', newName);
+
+    // 2. تحديث الاسم في كل العناصر التي تحمل IDs أو Classes معينة
+    updateNameInUI(newName);
+
+    alert("تم حفظ اسم الشركة وتحديثه في البرنامج بنجاح!");
+}
+
+// دالة مساعدة لتحديث الاسم في كل مكان
+function updateNameInUI(name) {
+    // تحديث في شاشة الترحيب
+    if (document.getElementById('display-company-name')) {
+        document.getElementById('display-company-name').innerText = name;
+    }
+    // تحديث في السايدبار (اللوجو)
+    if (document.getElementById('sidebar-logo-name')) {
+        document.getElementById('sidebar-logo-name').innerText = name;
+    }
+    // تحديث في جميع الفواتير (لو موجودة حالياً)
+    document.querySelectorAll('.invoice-company-name').forEach(el => {
+        el.innerText = name;
+    });
+}
+// أضف هذا الجزء في بداية ملف الـ script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const savedName = localStorage.getItem('company_name');
+    if (savedName) {
+        updateNameInUI(savedName);
+        // تأكد أن خانة الإدخال في الإعدادات يظهر فيها الاسم القديم أيضاً
+        if (document.getElementById('new-company-name')) {
+            document.getElementById('new-company-name').value = savedName;
+        }
+    }
+});
+function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.style.display = 'none';
+    } else {
+        console.error("تعذر إغلاق النافذة: العنصر " + id + " غير موجود");
+    }
+}
 function showSection(id) {
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
     document.getElementById(id).style.display = 'block';
@@ -30,45 +119,48 @@ function updateDashboard() {
     let totalStockValue = 0;
     let expectedProfit = 0;
     let lowStockCount = 0;
-
-    inventoryData.forEach(item => {
-        totalStockValue += (parseFloat(item.buy) * parseInt(item.qty));
-        expectedProfit += ((parseFloat(item.sell) - parseFloat(item.buy)) * parseInt(item.qty));
-        if (parseInt(item.qty) < 5) lowStockCount++;
-    });
-
-    const today = new Date().toLocaleDateString('ar-EG');
     let todaySales = 0;
 
+    // الحصول على تاريخ اليوم بصيغة ثابتة YYYY-MM-DD
+    const today = new Date().toISOString().split('T')[0];
+
+    // 1. حساب قيم المخزن
+    inventoryData.forEach(item => {
+        const qty = Number(item.qty) || 0;
+        const buy = Number(item.buy) || 0;
+        const sell = Number(item.sell) || 0;
+
+        totalStockValue += (buy * qty);
+        expectedProfit += ((sell - buy) * qty);
+        if (qty < 5) lowStockCount++;
+    });
+
+    // 2. حساب مبيعات اليوم من سجل العمليات
     salesHistory.forEach(record => {
-        // فحص مبيعات اليوم فقط من السجل
-        if (record.date.split(' ')[0] === today && record.type === 'صادر') {
-            todaySales += record.total;
+        // تحويل id السجل (Timestamp) إلى صيغة YYYY-MM-DD للمقارنة
+        const recordDate = new Date(record.id).toISOString().split('T')[0];
+        
+        if (recordDate === today && record.type === 'صادر') {
+            todaySales += Number(record.total) || 0;
         }
     });
 
-    // تحديث الواجهة
-    document.getElementById('dash-total-value').innerText = totalStockValue.toLocaleString() + " ج.م";
-    document.getElementById('dash-expected-profit').innerText = expectedProfit.toLocaleString() + " ج.م";
-    document.getElementById('dash-low-stock').innerText = lowStockCount;
-    document.getElementById('dash-today-sales').innerText = todaySales.toLocaleString() + " ج.م";
-}
-function updateDashboard() {
-    let totalValue = 0, profit = 0, lowStock = 0;
-    
-    inventoryData.forEach(p => {
-        totalValue += (Number(p.buy) * Number(p.qty));
-        profit += ((Number(p.sell) - Number(p.buy)) * Number(p.qty));
-        if (Number(p.qty) < 5) lowStock++;
-    });
+    // 3. تحديث الأرقام في الواجهة
+    const elements = {
+        'dash-total-value': totalStockValue,
+        'dash-expected-profit': expectedProfit,
+        'dash-low-stock': lowStockCount,
+        'dash-today-sales': todaySales
+    };
 
-    document.getElementById('dash-total-value').innerText = totalValue.toLocaleString() + ' ج.م';
-    document.getElementById('dash-expected-profit').innerText = profit.toLocaleString() + ' ج.م';
-    document.getElementById('dash-low-stock').innerText = lowStock;
-    // ... باقي حساب مبيعات اليوم ...
-}
-function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+    for (const [id, value] of Object.entries(elements)) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerText = id.includes('sales') || id.includes('value') || id.includes('profit') 
+                ? value.toLocaleString() + " ج.م" 
+                : value;
+        }
+    }
 }
 
 // --- 3. إدارة الأقسام ---
@@ -148,27 +240,61 @@ function openProductModal() {
     document.querySelectorAll('#productModal input').forEach(i => i.value = '');
     document.getElementById('productModal').style.display = 'block';
 }
-
 function saveProduct() {
-    const editId = document.getElementById('edit-id').value;
-    const prod = {
-        id: editId || Math.floor(Math.random() * 100000).toString(),
-        name: document.getElementById('m-name').value,
-        cat: document.getElementById('m-category').value,
-        buy: document.getElementById('m-buy').value,
-        sell: document.getElementById('m-sell').value,
-        qty: parseInt(document.getElementById('m-qty').value) || 0
-    };
+    try {
+        // 1. سحب البيانات وتأكيد القيم الرقمية
+        const editId = document.getElementById('edit-id').value;
+        const name = document.getElementById('m-name').value.trim();
+        const cat = document.getElementById('m-category').value;
+        const buy = parseFloat(document.getElementById('m-buy').value) || 0;
+        const sell = parseFloat(document.getElementById('m-sell').value) || 0;
+        const qty = parseInt(document.getElementById('m-qty').value) || 0;
 
-    if (editId) {
-        const idx = inventoryData.findIndex(i => i.id === editId);
-        inventoryData[idx] = prod;
-    } else {
-        inventoryData.push(prod);
+        if (!name) {
+            alert("يرجى إدخال اسم المنتج");
+            return;
+        }
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+        
+        // إذا أغلقنا نافذة المنتج، نصفر الـ ID لضمان عدم التعليق عند الإضافة الجديدة
+        if (modalId === 'productModal') {
+            const editId = document.getElementById('edit-id');
+            if (editId) editId.value = '';
+        }
     }
-    syncStorage();
-    closeModal('productModal');
-    loadInventory();
+}
+        // 2. معالجة البيانات (تعديل أو إضافة)
+        if (editId) {
+            const index = inventoryData.findIndex(p => p.id == editId);
+            if (index !== -1) {
+                inventoryData[index] = { id: editId, name, cat, buy, sell, qty };
+            }
+        } else {
+            const newProduct = {
+                id: Date.now().toString(), 
+                name, cat, buy, sell, qty
+            };
+            inventoryData.push(newProduct);
+        }
+
+        // 3. المزامنة والتحديث (هذا الجزء يمنع التعليق)
+        syncStorage();      
+        loadInventory();    
+        updateDashboard();  
+        
+        // 4. إغلاق المودال وتصفير الخانات
+        closeModal('productModal');
+        
+        // تصفير خانة الـ ID المخفية لضمان عدم الخلط في المرة القادمة
+        document.getElementById('edit-id').value = '';
+
+    } catch (error) {
+        console.error("Error in saveProduct:", error);
+        alert("حدث خطأ أثناء الحفظ، يرجى مراجعة البيانات");
+    }
 }
 
 function editProd(id) {
@@ -274,7 +400,7 @@ function processSale() {
 }
 
 // --- 6. نظام الوارد الذكي ---
-function searchProductForPurchase(query) {
+function searchProduct(query) {
     const resultsDiv = document.getElementById('purchase-results');
     if (!query) { resultsDiv.style.display = 'none'; return; }
 
@@ -587,14 +713,9 @@ function saleProcessInvoice() {
 
     printInvoice(customer, total, invoiceId);
     saleClearInvoice();
+    updateDashboard();
 }
-window.onload = () => {
-    const savedName = localStorage.getItem('company_name') || "شركتي الافتراضية";
-    updateGlobalCompanyName(savedName);
-    
-    // باقي دوالك القديمة...
-    loadInventory();
-};
+
 function printInvoice(customer, total, invoiceId) {
     const printWindow = window.open('', '', 'height=800,width=900');
     let totalQty = 0;
@@ -676,26 +797,10 @@ function saleClearInvoice() {
     saleRenderTable();
 }
 
-window.onload = () => {
-    updateCategoryDropdowns();
-    loadInventory();
-    applyAllFilters();
-    
-    // لو مفيش جلسة دخول، أظهر شاشة القفل الرئيسية
-    if (!sessionStorage.getItem('mainAuth')) {
-        document.getElementById('main-login-overlay').style.display = 'flex';
-    } else {
-        document.getElementById('main-login-overlay').style.display = 'none';
-    }
-};
 // المتغير ده هيشيل القسم اللي المستخدم داس عليه ومستني الباسوورد
 let pendingSection = "";
 
-const PASSWORDS = {
-    main: "123",        // للبرنامج كله
-    dashboard: "123",  // للوحة التحكم
-    inventory: "123"    // للمخزن
-};
+
 
 // --- حماية البرنامج بالكامل عند الفتح ---
 function checkMainPass() {
@@ -748,12 +853,26 @@ function verifySectionPass() {
 
 // الدالة المسؤولة عن الإخفاء والإظهار الفعلي
 function actualSwitch(id) {
+    // إخفاء كل الأقسام
     document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
     
-    // تحديث الشكل النشط في السايدبار (اختياري)
+    // إظهار القسم المطلوب
+    const targetSection = document.getElementById(id);
+    if (targetSection) {
+        targetSection.style.display = 'block';
+    }
+    
+    // تحديث البيانات بناءً على القسم المختار
+    if (id === 'dashboard-section') {
+        updateDashboard();
+    } else if (id === 'inventory') {
+        loadInventory();
+    } else if (id === 'reports') {
+        applyAllFilters();
+    }
+
+    // إخفاء حالة "النشط" من القائمة الجانبية
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    // تقدر تضيف كود يحدد العنصر النشط هنا
 }
 
 function closePassModal() {
@@ -781,70 +900,52 @@ function updateWelcomeClock() {
 }
 
 // تعديل بداية التشغيل
-window.onload = () => {
-    updateCategoryDropdowns();
-    loadInventory();
-    applyAllFilters();
-    setInterval(updateWelcomeClock, 1000); // تحديث الساعة كل ثانية
 
-    // إجبار البرنامج يفتح على صفحة الترحيب
-    showSection('welcome-section');
-    
-    if (!sessionStorage.getItem('mainAuth')) {
-        document.getElementById('main-login-overlay').style.display = 'flex';
-    }
-};
 
-// تعديل بسيط في دالة التبديل عشان تشيل "active" من الزراير لو رجعنا للترحيب
-function actualSwitch(id) {
-    document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-    
-    // إخفاء الـ active من السايدبار لو فاتحين صفحة الترحيب
-    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-}
 const compName = document.getElementById('new-company-name').value;
 if (compName) {
     localStorage.setItem('company_name', compName);
     document.getElementById('display-company-name').innerText = compName;
 }
 // دالة حفظ الإعدادات وكلمات المرور واسم الشركة
+// دالة حفظ الإعدادات وكلمات المرور واسم الشركة
 function saveNewPasswords() {
-    console.log("جاري حفظ التغييرات..."); // للتأكد من استدعاء الدالة
-
     try {
-        // جلب المدخلات
+        // 1. جلب القيم من الحقول
         const mainInp = document.getElementById('new-main-pass').value;
         const dashInp = document.getElementById('new-dash-pass').value;
         const invInp = document.getElementById('new-inv-pass').value;
         const compInp = document.getElementById('new-company-name').value;
 
-        // 1. تحديث كلمات المرور لو الخانات مش فاضية
+        // 2. حفظ اسم الشركة لو تم إدخاله
+        if (compInp.trim() !== "") {
+            localStorage.setItem('company_name', compInp);
+            // تحديث الاسم في الواجهة فوراً
+            if (document.getElementById('display-company-name')) {
+                document.getElementById('display-company-name').innerText = compInp;
+            }
+            // تحديث الاسم في اللوجو وفواتير الطباعة
+            updateGlobalCompanyName(compInp);
+        }
+
+        // 3. تحديث كلمات المرور (تأكد أن كائن PASSWORDS معرف في أول الملف)
         if (mainInp) PASSWORDS.main = mainInp;
         if (dashInp) PASSWORDS.dashboard = dashInp;
         if (invInp) PASSWORDS.inventory = invInp;
 
-        // 2. حفظ كلمات المرور في التخزين المحلي
-        localStorage.setItem('app_passwords', JSON.stringify(PASSWORDS));
+        // 4. حفظ كلمات المرور في الذاكرة
+        localStorage.setItem('myPasswords', JSON.stringify(PASSWORDS));
 
-        // 3. حفظ وتحديث اسم الشركة
-        if (compInp) {
-            localStorage.setItem('company_name', compInp);
-            // تحديث النص في صفحة الترحيب فوراً
-            const welcomeTitle = document.getElementById('display-company-name');
-            if (welcomeTitle) welcomeTitle.innerText = compInp;
-        }
-
-     
-        // مسح الخانات بعد الحفظ (اختياري)
-        document.getElementById('new-main-pass').value = '';
-        document.getElementById('new-dash-pass').value = '';
-        document.getElementById('new-inv-pass').value = '';
-        document.getElementById('new-company-name').value = '';
+        alert("تم حفظ الإعدادات واسم الشركة بنجاح!");
+        
+        // مسح الخانات بعد الحفظ للأمان
+        document.getElementById('new-main-pass').value = "";
+        document.getElementById('new-dash-pass').value = "";
+        document.getElementById('new-inv-pass').value = "";
 
     } catch (error) {
-        console.error("خطأ أثناء الحفظ:", error);
-        alert("حدث خطأ أثناء حفظ البيانات، راجع الكونسول.");
+        console.error("خطأ في حفظ الإعدادات:", error);
+        alert("حدث خطأ أثناء الحفظ");
     }
 }
 // دالة لتحديث اسم الشركة في كل مكان في الصفحة
@@ -897,3 +998,51 @@ document.addEventListener('keydown', (e) => {
     // F9 يحفظ الفاتورة فوراً
     if (e.key === 'F9') saleProcessInvoice();
 });
+// استرجاع الباسووردات المخزنة أو استخدام الافتراضية لو أول مرة يفتح
+const DEFAULT_PASSWORDS = { main: "123", dashboard: "123", inventory: "123" };
+let PASSWORDS = JSON.parse(localStorage.getItem('app_passwords')) || DEFAULT_PASSWORDS;
+function saveNewPasswords() {
+    try {
+        const mainInp = document.getElementById('new-main-pass').value;
+        const dashInp = document.getElementById('new-dash-pass').value;
+        const invInp = document.getElementById('new-inv-pass').value;
+        const compInp = document.getElementById('new-company-name').value;
+
+        // 1. تحديث الكائن PASSWORDS بالقيم الجديدة فقط لو تم إدخالها
+        if (mainInp) PASSWORDS.main = mainInp;
+        if (dashInp) PASSWORDS.dashboard = dashInp;
+        if (invInp) PASSWORDS.inventory = invInp;
+
+        // 2. الحفظ النهائي في الذاكرة
+        localStorage.setItem('app_passwords', JSON.stringify(PASSWORDS));
+
+        // 3. حفظ اسم الشركة وتحديثه
+        if (compInp) {
+            localStorage.setItem('company_name', compInp);
+            updateGlobalCompanyName(compInp); // دالة لتحديث الاسم في كل مكان
+        }
+
+    
+        // إعادة تحميل الصفحة لتطبيق التغييرات بشكل كامل
+        location.reload(); 
+
+    } catch (error) {
+        console.error("خطأ:", error);
+    
+    }
+}
+
+function updateGlobalCompanyName(newName) {
+    // تحديث الاسم في صفحة الترحيب
+    const welcomeName = document.getElementById('display-company-name');
+    if (welcomeName) welcomeName.innerText = newName;
+
+    // تحديث الاسم في السايدبار (اللوجو)
+    const sidebarName = document.getElementById('sidebar-logo-name');
+    if (sidebarName) sidebarName.innerText = newName;
+
+    // تحديث العنوان في الفواتير (لو موجودة)
+    document.querySelectorAll('.invoice-company-name').forEach(el => {
+        el.innerText = newName;
+    });
+}

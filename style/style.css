@@ -1135,3 +1135,6 @@ body {
     padding: 20px;
     margin-bottom: 20px;
 }
+.dropdown-content, .select2-container {
+    z-index: 9999 !important;
+}
