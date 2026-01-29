@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <title>نظام إدارة المبيعات </title>
     <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/style2.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.ico">
 </head>
 <body>
-<div id="main-login-overlay" style="position: fixed; inset: 0; background: #1a202c; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+<!-- <div id="main-login-overlay" style="position: fixed; inset: 0; background: #1a202c; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
     <h2 style="margin-bottom: 20px;">دخول البرنامج الرئيسي</h2>
     <input type="password" id="main-pass" placeholder="كلمة مرور البرنامج" style="padding: 12px; border-radius: 8px; border: none; width: 250px; text-align: center;">
     <button onclick="checkMainPass()" style="margin-top: 15px; padding: 10px 30px; background: #3182ce; color: white; border: none; border-radius: 8px; cursor: pointer;">دخول</button>
-</div>
+</div> -->
     <aside class="sidebar">
         <div class="logo" onclick="showSection('welcome-section')" style="cursor: pointer;">
     <i class="fas fa-store"></i>
@@ -34,8 +35,8 @@
         <div class="nav-item" onclick="showSection('reports')">
             <i class="fas fa-history"></i> <span>سجل الفواتير</span>
         </div>
-        <div class="nav-item active" onclick="showSection('inventory')">
-            <i class="fas fa-boxes"></i> <span>المخزن</span></div>
+        <div class="nav-item" onclick="showSection('inventory')"> <i class="fas fa-boxes"></i> المخزن
+</div>
             <div class="nav-item" onclick="showSection('dashboard-section')">
         <i class="fas fa-chart-line"></i> <span>لوحة التحكم</span>
     </div>
@@ -124,12 +125,25 @@
             </div>
 
             <div class="client-box">
-                <label>اسم العميل (اختياري)</label>
-                <div class="search-input-group">
-                    <i class="fas fa-user"></i>
-                    <input type="text" id="sale-customer-name" placeholder="أدخل اسم العميل...">
-                </div>
+    <div class="input-group-row">
+        <div class="input-item">
+            <label>اسم العميل (اختياري)</label>
+            <div class="search-input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="sale-customer-name" list="customers-list" placeholder="أدخل اسم العميل...">
+                <datalist id="customers-list">
+                    </datalist>
             </div>
+        </div>
+        <div class="input-item">
+            <label>رقم الهاتف</label>
+            <div class="search-input-group">
+                <i class="fas fa-phone"></i>
+                <input type="text" id="sale-customer-phone" placeholder="رقم الهاتف">
+            </div>
+        </div>
+    </div>
+</div>
         </div>
 
         <div class="table-container">
@@ -289,77 +303,85 @@
                 </tbody>
         </table>
     </div>
-</section>    </main>
+</section> 
 <section id="dashboard-section" class="content-section" style="display:none;">
     <div class="glass-header">
         <div class="title-area">
-            <h1><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h1>
-            <p>ملخص سريع لأداء النشاط التجاري اليوم</p>
+            <h1><i class="fas fa-chart-line"></i> لوحة التحكم والتقارير</h1>
+            <p>إدارة الأرباح، المصروفات، وجهات التعامل</p>
         </div>
     </div>
 
     <div class="dash-grid">
-        
-        
-
-        <div class="card-stat">
-            <div class="card-body">
-                <h3>مبيعات اليوم</h3>
-                <h2 id="dash-today-sales">0.00</h2>
-                <p>(إجمالي مبيعات الصادر اليوم)</p>
-            </div>
-            <i class="fas fa-cart-arrow-down"></i>
+        <div class="card-stat sales-card">
+            <div class="card-body"><h3>مبيعات اليوم</h3><h2 id="dash-today-sales">0.00</h2></div>
+            <i class="fas fa-shopping-basket"></i>
         </div>
-
-        
-
-        <div class="card-stat">
-            <div class="card-body">
-                <h3>أصناف أوشكت للنفاذ</h3>
-                <h2 id="dash-low-stock">0</h2>
-                <p>(أقل من 5 قطع بالمخزن)</p>
-            </div>
+        <div class="card-stat profit-card-daily">
+            <div class="card-body"><h3>أرباح اليوم</h3><h2 id="dash-today-profit">0.00</h2></div>
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="card-stat profit-card-monthly">
+            <div class="card-body"><h3>أرباح الشهر</h3><h2 id="dash-month-profit">0.00</h2></div>
+            <i class="fas fa-chart-bar"></i>
+        </div>
+        <div class="card-stat warning-card">
+            <div class="card-body"><h3>نواقص المخزن</h3><h2 id="dash-low-stock">0</h2></div>
             <i class="fas fa-exclamation-triangle"></i>
         </div>
-
     </div>
 
-
-    <div class="security-card">
-        <div class="security-input-group">
-    <label>اسم الشركة</label>
-    <input type="text" id="new-company-name" placeholder="ادخل اسم شركتك">
-</div>
-        <div class="security-header">
-            <i class="fas fa-user-shield"></i>
-            <h3>إدارة أمان الوصول وكلمات المرور</h3>
+    <div class="control-buttons-grid">
+        <div class="ctrl-card client-btn" onclick="openPeopleModal('customers')">
+            <i class="fas fa-user-friends"></i> <span>قائمة العملاء</span>
         </div>
-
-        <div class="security-grid">
-            <div class="security-input-group">
-                <label>كلمة مرور البرنامج (Main)</label>
-                <input type="password" id="new-main-pass" placeholder="تغيير الباسوورد الرئيسي">
-            </div>
-
-            <div class="security-input-group">
-                <label>كلمة مرور لوحة التحكم</label>
-                <input type="password" id="new-dash-pass" placeholder="تغيير باسوورد Dashboard">
-            </div>
-
-            <div class="security-input-group">
-                <label>كلمة مرور المخزن</label>
-                <input type="password" id="new-inv-pass" placeholder="تغيير باسوورد Inventory">
-            </div>
+        <div class="ctrl-card supplier-btn" onclick="openPeopleModal('suppliers')">
+            <i class="fas fa-truck-loading"></i> <span>قائمة الموردين</span>
         </div>
-
-        <div class="security-actions">
-            <button class="btn btn-save-security" onclick="saveNewPasswords()">
-                <i class="fas fa-save"></i> حفظ التغييرات
-            </button>
+        <div class="ctrl-card profit-btn" onclick="openLogsModal('profit')">
+            <i class="fas fa-history"></i> <span>سجل الأرباح</span>
+        </div>
+        <div class="ctrl-card expense-btn" onclick="openLogsModal('expenses')">
+            <i class="fas fa-receipt"></i> <span>سجل المصروفات</span>
         </div>
     </div>
 
+    <div class="security-card full-width">
+        <div class="security-header"><i class="fas fa-lock"></i> <h3>إعدادات الأمان والشركة</h3></div>
+        <div class="security-body">
+            <div class="input-full"><label>اسم الشركة</label><input type="text" id="new-company-name"></div>
+            <div class="security-row">
+                <div class="input-item"><label>باسوورد البرنامج</label><input type="password" id="new-main-pass"></div>
+                <div class="input-item"><label>باسوورد اللوحة</label><input type="password" id="new-dash-pass"></div>
+                <div class="input-item"><label>باسوورد المخزن</label><input type="password" id="new-inv-pass"></div>
+            </div>
+            <button class="btn-save-all" onclick="saveNewPasswords()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+        </div>
+    </div>
 </section>
+
+<div id="people-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header"><h3 id="modal-title">القائمة</h3><span class="close" onclick="closePeopleModal()">&times;</span></div>
+        <div class="modal-search"><i class="fas fa-search"></i><input type="text" id="modal-search-input" onkeyup="filterModalList()" placeholder="بحث عن اسم..."></div>
+        <ul id="modal-items-list" class="modal-list-body"></ul>
+    </div>
+</div>
+
+<div id="logs-modal" class="modal-overlay">
+    <div class="modal-content wide-modal">
+        <div class="modal-header"><h3 id="logs-modal-title">السجل</h3><span class="close" onclick="closeLogsModal()">&times;</span></div>
+        <div class="modal-search"><i class="fas fa-search"></i><input type="text" id="logs-search-input" onkeyup="filterLogsTable()" placeholder="بحث في السجل..."></div>
+        <div class="modal-list-body">
+            <table class="logs-table">
+                <thead id="logs-table-head"></thead>
+                <tbody id="logs-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+   </main>
+
     <div id="productModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal('productModal')">&times;</span>
@@ -413,7 +435,25 @@
     <div>المستخدم: مدير النظام</div>
     <div class="status-online">متصل (قاعدة بيانات محلية)</div>
 </div>
-
+<div id="people-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">قائمة العملاء</h3>
+            <button class="close-modal" onclick="closePeopleModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="search-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="modal-search-input" onkeyup="filterModalList()" placeholder="ابدأ الكتابة للبحث...">
+            </div>
+            
+            <ul id="modal-items-list" class="modal-list">
+                </ul>
+                
+        </div>
+    </div>
+</div>
 <style>
 .status-bar {
     position: fixed;
@@ -432,6 +472,7 @@
 }
 </style>
     <script src="js/script.js"></script>
+    <script src="js/script2.js"></script>
 
 </body>
 </html>

@@ -1,7 +1,22 @@
 // --- 1. تهيئة البيانات وتحميلها من الذاكرة المحلية ---
 let inventoryData = JSON.parse(localStorage.getItem('myInventory')) || [];
-let categories = JSON.parse(localStorage.getItem('myCategories')) || ["إلكترونيات", "أدوات منزلية"];
+let categories = JSON.parse(localStorage.getItem('myCategories')) || ["", " "];
 let salesHistory = JSON.parse(localStorage.getItem('mySalesHistory')) || [];
+let allCustomersSet = new Set(JSON.parse(localStorage.getItem('saved_customers')) || []);
+let allSuppliersSet = new Set(JSON.parse(localStorage.getItem('saved_suppliers')) || []);
+
+// جوه دالة saleProcessInvoice
+const nameInput = document.getElementById('sale-customer-name');
+const phoneInput = document.getElementById('sale-customer-phone');
+
+if (nameInput.value.trim() !== "عميل نقدي") {
+    // السطر ده هو اللي بيلحم الاسم والرقم عشان يظهروا في القائمة
+    const entry = `${nameInput.value.trim()} | ${phoneInput.value.trim()}`;
+    allCustomersSet.add(entry); 
+    
+    // حفظ في الذاكرة
+    localStorage.setItem('saved_customers', JSON.stringify(Array.from(allCustomersSet)));
+}
 
 // متغيرات الحالة المؤقتة
 let currentInvoice = [];      // لفاتورة البيع
@@ -679,43 +694,90 @@ function saleRemoveItem(index) {
     saleCart.splice(index, 1);
     saleRenderTable();
 }
-
-function saleProcessInvoice() {
-    if (saleCart.length === 0) return;
-
-    const total = saleCart.reduce((sum, item) => sum + (item.sell * item.count), 0);
-    const customer = document.getElementById('sale-customer-name').value || "عميل نقدي";
-    const invoiceId = Date.now();
-
-    const transaction = {
-        id: invoiceId,
-        date: new Date().toLocaleString('ar-EG'),
-        type: 'صادر',
-        party: customer,
-        itemsCount: saleCart.length,
-        total: total, 
-        details: [...saleCart]
-    };
-
-    salesHistory.unshift(transaction);
-    localStorage.setItem('mySalesHistory', JSON.stringify(salesHistory));
-
-    saleCart.forEach(item => {
-        const prodIndex = inventoryData.findIndex(p => p.id === item.id);
-        if (prodIndex !== -1) {
-            inventoryData[prodIndex].qty -= item.count;
-        }
-    });
-    localStorage.setItem('myInventory', JSON.stringify(inventoryData));
-
-    if (typeof loadInventory === "function") loadInventory();
-    if (typeof applyAllFilters === "function") applyAllFilters();
-
-    printInvoice(customer, total, invoiceId);
-    saleClearInvoice();
-    updateDashboard();
+function autoFillCustomerPhone() {
+    const nameInput = document.getElementById('sale-customer-name').value.trim();
+    const phoneInput = document.getElementById('sale-customer-phone');
+    
+    // بندور في قائمة العملاء اللي خزناها (اسم | رقم)
+    const customersArray = Array.from(allCustomersSet);
+    const match = customersArray.find(c => c.startsWith(nameInput + " | "));
+    
+    if (match && phoneInput) {
+        const [name, phone] = match.split(' | ');
+        phoneInput.value = phone;
+    }
 }
+function saleProcessInvoice() {
+    try {
+        if (saleCart.length === 0) {
+            alert("السلة فارغة!");
+            return;
+        }
 
+        // 1. مسك العناصر
+        const nameInp = document.getElementById('sale-customer-name');
+        const phoneInp = document.getElementById('sale-customer-phone');
+        
+        // 2. سحب القيم في متغيرات ثابتة "قبل التصفير"
+        const customer = nameInp ? nameInp.value.trim() : "عميل نقدي";
+        const phone = phoneInp ? phoneInp.value.trim() : "";
+        const total = saleCart.reduce((sum, item) => sum + (item.sell * item.count), 0);
+        const invoiceId = Date.now();
+
+        // 3. التصفير الإجباري واللحظي (هنا السر)
+        if (nameInp) nameInp.value = '';
+        if (phoneInp) phoneInp.value = '';
+
+        // 4. حفظ الاسم والرقم في القائمة الدائمة (اللحام)
+        if (customer !== "" && customer !== "عميل نقدي") {
+            const fullEntry = phone ? `${customer} | ${phone}` : customer;
+            allCustomersSet.add(fullEntry); 
+            localStorage.setItem('saved_customers', JSON.stringify(Array.from(allCustomersSet)));
+        }
+
+        // 5. تحديث المخزن (خصم الكميات)
+        saleCart.forEach(item => {
+            const prodIndex = inventoryData.findIndex(p => p.id === item.id);
+            if (prodIndex !== -1) {
+                inventoryData[prodIndex].qty -= item.count;
+            }
+        });
+
+        // 6. حفظ الفاتورة في السجل التاريخي (بما فيها الرقم)
+        const transaction = { 
+            id: invoiceId, 
+            date: new Date().toLocaleString('ar-EG'),
+            party: customer, 
+            phone: phone, 
+            total: total,
+            details: [...saleCart] 
+        };
+        salesHistory.unshift(transaction);
+        localStorage.setItem('mySalesHistory', JSON.stringify(salesHistory));
+
+        // 7. المزامنة والطباعة
+        if (typeof syncStorage === "function") syncStorage();
+        if (typeof loadInventory === "function") loadInventory();
+        if (typeof updateDashboard === "function") updateDashboard();
+        if (typeof renderPeopleList === "function") renderPeopleList();
+        
+        // أمر الطباعة
+        if (typeof printInvoice === "function") {
+            printInvoice(customer, total, invoiceId);
+        }
+
+        // 8. تنظيف الجدول (السلة)
+        if (typeof saleClearInvoice === "function") saleClearInvoice();
+
+        
+
+    } catch (e) {
+        console.error("عطل في العملية:", e);
+        // محاولة تصفير أخيرة في حالة حدوث خطأ كارثي
+        document.getElementById('sale-customer-name').value = '';
+        document.getElementById('sale-customer-phone').value = '';
+    }
+}
 function printInvoice(customer, total, invoiceId) {
     const printWindow = window.open('', '', 'height=800,width=900');
     let totalQty = 0;
