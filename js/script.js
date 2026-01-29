@@ -409,10 +409,30 @@ function applyAllFilters() {
                     <td>${record.party}</td>
                     <td>${record.itemsCount} أصناف</td>
                     <td style="font-weight:bold">${record.total.toFixed(2)} ج.م</td>
-                    <td><button onclick="deleteInvoice(${index})" class="btn-delete-sm"><i class="fas fa-trash"></i></button></td>
+                
+<td>
+    <button onclick="viewOldInvoice(${index})" class="btn-view-sm" title="معاينة الفاتورة">
+        <i class="fas fa-eye"></i>
+    </button>
+    
+    <button onclick="deleteInvoice(${index})" class="btn-delete-sm" title="حذف">
+        <i class="fas fa-trash"></i>
+    </button>
+</td>
                 </tr>`;
         }
     });
+}function viewOldInvoice(index) {
+    const record = salesHistory[index];
+    if (!record.details || record.details.length === 0) {
+        alert("عذراً، لا توجد تفاصيل أصناف لهذه الفاتورة.");
+        return;
+    }
+    // بنجهز السلة مؤقتاً عشان دالة الطباعة تشتغل
+    saleCart = record.details; 
+    printInvoice(record.party, record.total, record.id);
+    // بنصفرها تاني عشان متأثرش على مبيعاتك الحالية
+    saleCart = []; 
 }
 
 function deleteInvoice(index) {
@@ -449,14 +469,12 @@ function saleAddToCart(productId) {
     if (existing) {
         if (existing.count < product.qty) existing.count++;
     } else {
-        saleCart.push({ ...product, count: 1 });
+        // ضيفنا خاصية التعديل هنا
+        saleCart.push({ ...product, count: 1, isEditing: false });
     }
     
-    document.getElementById('sale-search-input').value = '';
-    document.getElementById('sale-search-results').style.display = 'none';
     saleRenderTable();
 }
-
 function saleRenderTable() {
     const tbody = document.querySelector('#sale-invoice-table tbody');
     let total = 0;
@@ -465,18 +483,65 @@ function saleRenderTable() {
     saleCart.forEach((item, index) => {
         const rowTotal = item.sell * item.count;
         total += rowTotal;
-        tbody.innerHTML += `
-            <tr>
-                <td>${item.name}</td>
-                <td>${item.sell}</td>
-                <td><input type="number" value="${item.count}" min="1" onchange="saleUpdateQty(${index}, this.value)" style="width:50px"></td>
-                <td>${rowTotal.toFixed(2)}</td>
-                <td><button onclick="saleRemoveItem(${index})">×</button></td>
-            </tr>`;
+
+        // التحقق من حالة التعديل
+        if (item.isEditing) {
+            tbody.innerHTML += `
+                <tr class="editing-row">
+                    <td>${item.name}</td>
+                    <td><input type="number" id="edit-price-${index}" class="edit-input" value="${item.sell}"></td>
+                    <td><input type="number" id="edit-qty-${index}" class="edit-input" value="${item.count}"></td>
+                    <td>${rowTotal.toFixed(2)}</td>
+                    <td>
+                        <button onclick="saveRowEdit(${index})" class="btn-action save" title="حفظ"><i class="fas fa-check"></i></button>
+                        <button onclick="cancelRowEdit(${index})" class="btn-action cancel" title="إلغاء"><i class="fas fa-times"></i></button>
+                    </td>
+                </tr>`;
+        } else {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${item.sell}</td>
+                    <td>${item.count}</td>
+                    <td>${rowTotal.toFixed(2)}</td>
+                    <td>
+                        <button onclick="toggleRowEdit(${index})" class="btn-action edit" title="تعديل"><i class="fas fa-pen"></i></button>
+                        <button onclick="saleRemoveItem(${index})" class="btn-action delete" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>`;
+        }
     });
     document.getElementById('sale-grand-total').innerText = total.toFixed(2);
 }
 
+// دالة الإلغاء
+function cancelRowEdit(index) {
+    saleCart[index].isEditing = false;
+    saleRenderTable();
+}
+// فتح خانات الإدخال
+function toggleRowEdit(index) {
+    saleCart[index].isEditing = true;
+    saleRenderTable();
+}
+
+// حفظ البيانات الجديدة وإغلاق الخانات
+function saveRowEdit(index) {
+    const newQty = parseInt(document.getElementById(`edit-qty-${index}`).value);
+    const newPrice = parseFloat(document.getElementById(`edit-price-${index}`).value);
+    
+    // فحص المخزن قبل الحفظ
+    const original = inventoryData.find(p => p.id === saleCart[index].id);
+    if (newQty > original.qty) {
+        alert("الكمية المطلوبة أكبر من المتوفر بالمخزن!");
+        return;
+    }
+
+    saleCart[index].count = newQty;
+    saleCart[index].sell = newPrice;
+    saleCart[index].isEditing = false; // نرجعها نص عادي
+    saleRenderTable();
+}
 function saleUpdateQty(index, val) {
     const n = parseInt(val);
     const max = saleCart[index].qty;
@@ -628,8 +693,8 @@ let pendingSection = "";
 
 const PASSWORDS = {
     main: "123",        // للبرنامج كله
-    dashboard: "dash",  // للوحة التحكم
-    inventory: "inv"    // للمخزن
+    dashboard: "123",  // للوحة التحكم
+    inventory: "123"    // للمخزن
 };
 
 // --- حماية البرنامج بالكامل عند الفتح ---
@@ -811,3 +876,24 @@ function saveNewPasswords() {
     localStorage.setItem('app_passwords', JSON.stringify(PASSWORDS));
 
 }
+// اسمع لأزرار الكيبورد جوه الجدول
+document.addEventListener('keydown', function(e) {
+    if (e.target.classList.contains('edit-input')) {
+        const index = e.target.id.split('-').pop(); // بيجيب الـ index من الـ id
+        
+        if (e.key === 'Enter') {
+            saveRowEdit(index);
+        } else if (e.key === 'Escape') {
+            cancelRowEdit(index);
+        }
+    }
+});
+document.addEventListener('contextmenu', event => event.preventDefault());
+document.addEventListener('keydown', (e) => {
+    // Alt + S يفتح المبيعات
+    if (e.altKey && e.key === 's') showSection('sales-section');
+    // Alt + I يفتح المخزن
+    if (e.altKey && e.key === 'i') showSection('inventory');
+    // F9 يحفظ الفاتورة فوراً
+    if (e.key === 'F9') saleProcessInvoice();
+});

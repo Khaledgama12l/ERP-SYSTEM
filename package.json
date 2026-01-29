@@ -1,0 +1,21 @@
+{
+  "name": "erp-system",
+  "version": "1.0.0",
+  "description": "ERP System Project",
+  "author": "Khaled",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "34.0.1",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.khaled.erp",
+    "win": {
+      "target": "nsis"
+    }
+  }
+}

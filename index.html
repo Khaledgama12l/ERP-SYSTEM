@@ -2,20 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام إدارة المخازن الاحترافي</title>
+    <title>نظام إدارة المبيعاتz </title>
     <link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-<!-- <div id="main-login-overlay" style="position: fixed; inset: 0; background: #1a202c; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
+<div id="main-login-overlay" style="position: fixed; inset: 0; background: #1a202c; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
     <h2 style="margin-bottom: 20px;">دخول البرنامج الرئيسي</h2>
     <input type="password" id="main-pass" placeholder="كلمة مرور البرنامج" style="padding: 12px; border-radius: 8px; border: none; width: 250px; text-align: center;">
     <button onclick="checkMainPass()" style="margin-top: 15px; padding: 10px 30px; background: #3182ce; color: white; border: none; border-radius: 8px; cursor: pointer;">دخول</button>
-</div> -->
+</div>
     <aside class="sidebar">
         <div class="logo" onclick="showSection('welcome-section')" style="cursor: pointer;">
     <i class="fas fa-store"></i>
-    <span id="sidebar-logo-name">متجري الذكي</span>
+    <span id="sidebar-logo-name">إسم الشركة</span>
 </div>
         <nav>
             <div class="nav-item" onclick="showSection('welcome-section')">
@@ -47,7 +48,7 @@
             <div class="company-logo-large">
                 <i class="fas fa-building"></i>
             </div>
-            <h1 id="display-company-name">اسم الشركة الخاص بك</h1>
+            <h1 id="display-company-name">اسم الشركة  </h1>
             <p>نظام إدارة المستودعات والمبيعات المتكامل</p>
             
             <div class="welcome-stats-mini">
@@ -68,7 +69,7 @@
         <section id="inventory" class="content-section">
             <div class="glass-header">
                 <div class="title-area">
-                    <h1>حالة المخزن</h1>
+                    <h1> المخزن</h1>
                     <p>إدارة وتتبع المنتجات الحالية</p>
                 </div>
                 <div class="action-area">
@@ -105,8 +106,8 @@
 <section id="sales" class="content-section">
     <div class="glass-header">
         <div class="title-area">
-            <h1><i class="fas fa-shopping-cart"></i> فاتورة بيع (صادر)</h1>
-            <p>سحب بضاعة من المخزن وإصدار فاتورة للعميل</p>
+            <h1><i class="fas fa-shopping-cart"></i> فاتورة بيع</h1>
+            
         </div>
     </div>
 
@@ -174,8 +175,8 @@
         <section id="purchase" class="content-section">
     <div class="glass-header">
         <div class="title-area">
-            <h1><i class="fas fa-truck-loading"></i> فاتورة وارد ذكية</h1>
-            <p>أضف منتجات موجودة أو أنشئ أصنافاً جديدة مباشرة من هنا</p>
+            <h1><i class="fas fa-truck-loading"></i> فاتورة وارد </h1>
+            
         </div>
     </div>
 
@@ -186,7 +187,7 @@
                 <div style="display: flex; gap: 8px;">
                     <div class="search-container" style="position: relative; flex: 1;">
     <input type="text" id="purchase-search" 
-           placeholder="مثلاً: بيبسي كولا 2 لتر..." 
+           placeholder="أدخل إسم المنتج هنا ..." 
            oninput="searchProduct(this.value, 'وارد')" 
            onkeydown="if(event.key === 'Enter') handleManualEntry()"
            style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
@@ -236,7 +237,7 @@
             <div class="actions">
                 <button class="btn btn-green" onclick="processSmartPurchase()" 
                         style="padding: 15px 40px; font-size: 1.1rem; background: #10b981; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);">
-                    <i class="fas fa-save"></i> حفظ وتحديث المخزن الآن
+                    <i class="fas fa-save"></i> حفظ في المخزن 
                 </button>
             </div>
         </div>
@@ -406,6 +407,29 @@
         </div>
     </div>
 </div>
+<div class="status-bar">
+    <div id="live-clock"></div>
+    <div>المستخدم: مدير النظام</div>
+    <div class="status-online">متصل (قاعدة بيانات محلية)</div>
+</div>
+
+<style>
+.status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: #34495e;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    align-items: center;
+    font-size: 12px;
+    z-index: 1000;
+}
+</style>
     <script src="js/script.js"></script>
 
 </body>
