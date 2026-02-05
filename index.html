@@ -5,156 +5,303 @@
     <title>نظام إدارة المبيعات </title>
     <link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="style/style2.css">
+    <link rel="stylesheet" href="style/style3.css">
+    <!-- <link rel="stylesheet" href="style/style4.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.ico">
 </head>
 <body>
-<!-- <div id="main-login-overlay" style="position: fixed; inset: 0; background: #1a202c; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white;">
-    <h2 style="margin-bottom: 20px;">دخول البرنامج الرئيسي</h2>
-    <input type="password" id="main-pass" placeholder="كلمة مرور البرنامج" style="padding: 12px; border-radius: 8px; border: none; width: 250px; text-align: center;">
-    <button onclick="checkMainPass()" style="margin-top: 15px; padding: 10px 30px; background: #3182ce; color: white; border: none; border-radius: 8px; cursor: pointer;">دخول</button>
-</div> -->
-    <aside class="sidebar">
-        <div class="logo" onclick="showSection('welcome-section')" style="cursor: pointer;">
-    <i class="fas fa-store"></i>
-    <span id="sidebar-logo-name">إسم الشركة</span>
-</div>
-        <nav>
-            <div class="nav-item" onclick="showSection('welcome-section')">
-    <i class="fas fa-home"></i>
-    <span>الرئيسية</span>
-</div>
+    <!-- <div id="main-login-overlay">
+    
+    
+
+    <div class="login-side-form">
+        <div class="login-header">
+            <h2>مرحباً بك</h2>
+            <p>يرجى تسجيل الدخول للمتابعة</p>
         </div>
+
+        <div class="input-group">
+            <label>اسم المستخدم</label>
+            <input type="text" id="main-username" value="admin" class="login-input">
+        </div>
+
+        <div class="input-group">
+            <label>كلمة المرور</label>
+            <input type="password" id="main-pass" placeholder="••••••••" class="login-input">
+        </div>
+
+        <button onclick="checkMainPass()" class="btn-login">
+            دخول النظام
+        </button>
+    </div>
+    <div class="login-side-image"></div>
+</div> -->
+
+
+<aside class="sidebar">
+    <nav>
+        <div class="nav-item active" onclick="showSection('welcome-section')">
+            <i class="fas fa-home"></i> <span>الرئيسية</span>
+        </div>
+        
         <div class="nav-item" onclick="showSection('sales')">
             <i class="fas fa-shopping-cart"></i> <span>فاتورة بيع</span>
         </div>
+        
         <div class="nav-item" onclick="showSection('purchase')">
             <i class="fas fa-truck-loading"></i> <span>فاتورة وارد</span>
         </div>
+        
         <div class="nav-item" onclick="showSection('reports')">
             <i class="fas fa-history"></i> <span>سجل الفواتير</span>
         </div>
-        <div class="nav-item" onclick="showSection('inventory')"> <i class="fas fa-boxes"></i> المخزن
-</div>
-            <div class="nav-item" onclick="showSection('dashboard-section')">
-        <i class="fas fa-chart-line"></i> <span>لوحة التحكم</span>
-    </div>
-        </nav>
-    </aside>
-
+        
+        <div class="nav-item"  onclick="checkPassAndShow('inventory', 'inv_pass')"> 
+            <i class="fas fa-boxes"></i> <span>المخزن</span>
+        </div>
+        
+        <div class="nav-item" onclick="checkPassAndShow('dashboard-section', 'dash_pass')">
+            <i class="fas fa-chart-line"></i> <span>لوحة التحكم</span>
+        </div>
+        <div class="nav-item" onclick="showSection('settings-section')">
+            <i class="fas fa-cog"></i> <span>الإعدادات</span>
+        </div>
+    </nav>
+</aside>
+<!-- onclick="showSection('dashboard-section')" 
+onclick="showSection('inventory')" -->
     <main class="main-content">
-        <section id="welcome-section" class="content-section">
+    <section id="welcome-section" class="content-section">
     <div class="welcome-container">
-        <div class="welcome-content">
-            <div class="company-logo-large">
-                <i class="fas fa-building"></i>
+        <div class="welcome-card">
+            <div class="company-logo-wrapper">
+                <i class="fas fa-layer-group"></i>
             </div>
-            <h1 id="display-company-name">اسم الشركة  </h1>
-            <p>نظام إدارة المستودعات والمبيعات المتكامل</p>
+            
+            <h1 id="display-company-name" class="company-title"> إسم</h1>
+            <p class="system-subtitle">نظام إدارة المستودعات والمبيعات المتكامل</p>
             
             <div class="welcome-stats-mini">
                 <div class="mini-stat">
+                    <i class="far fa-calendar-alt"></i>
                     <span id="welcome-date">--/--/----</span>
                     <label>تاريخ اليوم</label>
                 </div>
                 <div class="mini-stat">
+                    <i class="far fa-clock"></i>
                     <span id="welcome-time">--:--</span>
                     <label>الوقت الحالي</label>
                 </div>
             </div>
 
-            
+            <div class="quick-access-wrapper">
+                <button id="quick-btn-1" class="btn-quick" title="وصول سريع 1">
+                    <i class="fas fa-rocket"></i> اختصار 1
+                </button>
+                <button id="quick-btn-2" class="btn-quick" title="وصول سريع 2">
+                    <i class="fas fa-th-large"></i> اختصار 2
+                </button>
+            </div>
         </div>
     </div>
-</section>
-        <section id="inventory" class="content-section">
-            <div class="glass-header">
-                <div class="title-area">
-                    <h1> المخزن</h1>
-                    <p>إدارة وتتبع المنتجات الحالية</p>
-                </div>
-                <div class="action-area">
-                    <select id="filter-category" onchange="filterInventory()" class="fancy-select">
-                        <option value="all">كل الأقسام</option>
-                    </select>
-                    <button class="btn btn-purple" onclick="openCatModal()">
-                        <i class="fas fa-tags"></i> إدارة الأقسام
-                    </button>
-                    <button class="btn btn-green" onclick="openProductModal()">
-                        <i class="fas fa-plus-circle"></i> إضافة منتج
-                    </button>
-                </div>
-            </div>
+</section> 
+        
 
-            <div class="table-container">
-                <table id="inventory-table">
-                    <thead>
-                        <tr>
-                            <th>كود</th>
-                            <th>المنتج</th>
-                            <th>القسم</th>
-                            <th>الكمية</th>
-                            <th>سعر الشراء</th>
-                            <th>سعر البيع</th>
-                            <th>إجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+        
+    <section id="inventory" class="content-section">
+    <div class="glass-header">
+        <div class="title-area">
+            <h1>المخزن</h1>
+            <div class="inventory-header">
+                <span>العرض الحالي: <b id="current-view-title">كل المخازن</b></span>
             </div>
-            
-        </section>
+        </div>
+        
+        <div class="action-area">
+            <button class="btn btn-blue" onclick="openSortModal()">
+                <i class="fas fa-filter"></i> فرز
+            </button>
+
+            <button class="btn btn-orange" onclick="openWarehouseModal()">
+                <i class="fas fa-warehouse"></i> إدارة المخازن
+            </button>
+
+            <button class="btn btn-purple" onclick="openCatModal()">
+                <i class="fas fa-tags"></i> إدارة الأقسام
+            </button>
+
+            <button class="btn btn-green" onclick="openProductModal()">
+                <i class="fas fa-plus-circle"></i> إضافة منتج
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="inventory-table">
+            <thead>
+                <tr>
+                    <th>كود</th>
+                    <th>المنتج</th>
+                    <th>المخزن</th> <th>القسم</th>
+                    <th>الكمية</th>
+                    <th>سعر الشراء</th>
+                    <th>سعر البيع</th>
+                    <th>التاريخ</th> <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+</section> 
+
+<div id="modal-product" class="modal-overlay">
+    <div class="modal-content glass-morphism">
+        <h2><i class="fas fa-plus-circle"></i> إضافة منتج جديد</h2>
+        <div class="grid-form">
+            <input type="text" id="p-name" placeholder="اسم المنتج">
+            <select id="p-warehouse-select"></select> <select id="p-category-select"></select>  <input type="number" id="p-qty" placeholder="الكمية">
+            <input type="number" id="p-buy" placeholder="سعر الشراء">
+            <input type="number" id="p-sell" placeholder="سعر البيع">
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-green" onclick="saveProduct()">حفظ</button>
+            <button class="btn btn-red" onclick="closeAllModals()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-manage" class="modal-overlay">
+    <div class="modal-content glass-morphism">
+        <h2 id="manage-title">إدارة</h2>
+        <div class="add-area">
+            <input type="text" id="new-item-input" placeholder="الأسم الجديد">
+            <button class="btn btn-blue" onclick="addNewItem()">إضافة</button>
+        </div>
+        <ul id="items-list" class="styled-list"></ul>
+        <div class="modal-footer">
+            <button class="btn btn-red" onclick="closeAllModals()">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-filter" class="modal-overlay">
+    <div class="modal-content glass-morphism">
+        <h2><i class="fas fa-filter"></i> الفرز المتقدم</h2>
+        <div class="filter-grid">
+            <label>المخزن:</label>
+            <select id="filter-warehouse"></select>
+            <label>القسم:</label>
+            <select id="filter-category"></select>
+            <label>من تاريخ:</label>
+            <input type="date" id="filter-date-from">
+            <label>إلى تاريخ:</label>
+            <input type="date" id="filter-date-to">
+            <label>ترتيب حسب:</label>
+            <select id="filter-sort">
+                <option value="none">بدون ترتيب</option>
+                <option value="price-high">السعر (من الأعلى)</option>
+                <option value="price-low">السعر (من الأقل)</option>
+                <option value="qty-low">كمية منخفضة</option>
+            </select>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="applyAdvancedFilter()">تطبيق الفرز</button>
+            <button class="btn btn-red" onclick="closeAllModals()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+
+
 <section id="sales" class="content-section">
     <div class="glass-header">
         <div class="title-area">
             <h1><i class="fas fa-shopping-cart"></i> فاتورة بيع</h1>
-            
         </div>
     </div>
 
     <div class="invoice-container">
-        <div class="invoice-inputs">
-            <div class="search-box-wrapper">
-                <label>البحث عن منتج</label>
+        <div class="invoice-meta-grid top-meta">
+            <div class="input-item">
+                <label>اسم العميل</label>
                 <div class="search-input-group">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="sale-search-input" placeholder="اكتب اسم المنتج أو الكود..." oninput="saleSearch(this.value)">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="sale-customer-name" placeholder="أدخل اسم العميل...">
                 </div>
-                <div id="sale-search-results" class="search-results-dropdown"></div>
             </div>
-
-            <div class="client-box">
-    <div class="input-group-row">
-        <div class="input-item">
-            <label>اسم العميل (اختياري)</label>
-            <div class="search-input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="sale-customer-name" list="customers-list" placeholder="أدخل اسم العميل...">
-                <datalist id="customers-list">
-                    </datalist>
+            <div class="input-item">
+                <label>رقم الهاتف</label>
+                <div class="search-input-group">
+                    <i class="fas fa-phone"></i>
+                    <input type="text" id="sale-customer-phone" placeholder="رقم الهاتف">
+                </div>
+            </div>
+            <div class="input-item">
+                <label>طريقة الدفع</label>
+                <div class="search-input-group">
+                    <i class="fas fa-wallet"></i>
+                    <select id="sale-payment-method">
+                        <option value="cash">نقدي (Cash)</option>
+                        <option value="card">فيزا (Visa)</option>
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="input-item">
-            <label>رقم الهاتف</label>
-            <div class="search-input-group">
-                <i class="fas fa-phone"></i>
-                <input type="text" id="sale-customer-phone" placeholder="رقم الهاتف">
-            </div>
+
+        <div class="search-section-wrapper">
+    <div class="search-box-wrapper" style="flex: 3;">
+        <label>البحث عن منتج</label>
+        <div class="search-input-group">
+            <i class="fas fa-barcode"></i>
+            <input type="text" id="sale-search-input" placeholder="ابحث بالاسم أو الباركود..." oninput="saleSearch(this.value)">
+        </div>
+        <div id="sale-search-results" class="search-results-dropdown"></div>
+    </div>
+
+    <div class="qty-box-wrapper" style="flex: 1;">
+        <label>الكمية</label>
+        <div class="search-input-group">
+            <input type="number" id="sale-qty-input" value="1" min="1" onkeydown="if(event.key==='Enter') confirmAddToInvoice()">
+            <button class="btn-add-fast" onclick="confirmAddToInvoice()"><i class="fas fa-plus"></i></button>
         </div>
     </div>
 </div>
-        </div>
+            <div class="invoice-footer">
+            <div class="total-display">
+                <div class="total-main">
+                    <span>إجمالي الفاتورة:</span>
+                    <h2 id="sale-grand-total">0.00</h2>
+                </div>
+            </div>
+            <div class="invoice-actions">
+                <div class="clear-btn-container" style="position: relative; display: inline-block;">
+    <button class="btn btn-clear" onclick="showClearConfirm()">
+        <i class="fas fa-trash-alt"></i> مسح الفاتورة
+    </button>
 
-        <div class="table-container">
+    <div id="clear-confirm-pop" class="mini-pop">
+        <p>متأكد؟</p>
+        <div class="mini-pop-btns">
+            <button class="confirm-yes" onclick="saleClearInvoice(true)">نعم</button>
+            <button class="confirm-no" onclick="saleClearInvoice(false)">لا</button>
+        </div>
+    </div>
+</div>
+                <button class="btn btn-confirm" onclick="saleProcessInvoice()">إتمام العملية</button>
+            </div>
+        </div>
+        <div class="table-container invoice-table-wrapper">
             <table id="sale-invoice-table" class="invoice-table">
                 <thead>
                     <tr>
                         <th>المنتج</th>
-                        <th>السعر (ج.م)</th>
+                        <th>السعر</th>
                         <th>الكمية</th>
                         <th>الإجمالي</th>
-                        <th style="width: 50px;">حذف</th>
+                        <th style="width: 40px;"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -162,113 +309,115 @@
             </table>
         </div>
 
-        <div class="invoice-footer">
-            <div class="total-display">
-                <div class="total-item">
-                    <span>عدد الأصناف:</span>
-                    <span id="sale-items-count">0</span>
-                </div>
-                <div class="total-main">
-                    <span>الإجمالي النهائي:</span>
-                    <h2 id="sale-grand-total">0.00</h2>
-                    <small>جنيه مصري</small>
-                </div>
-            </div>
-            
-            <div class="invoice-actions">
-                <button class="btn btn-clear" onclick="saleClearInvoice()">
-                    <i class="fas fa-trash-alt"></i> مسح الفاتورة
-                </button>
-                <button class="btn btn-confirm" onclick="saleProcessInvoice()">
-                    <i class="fas fa-check-double"></i> إتمام عملية البيع
-                </button>
-            </div>
-        </div>
+        
     </div>
-</section>
+</section> 
         
         <section id="purchase" class="content-section">
-    <div class="glass-header">
+    <div class="glass-header purchase-header">
         <div class="title-area">
             <h1><i class="fas fa-truck-loading"></i> فاتورة وارد </h1>
-            
         </div>
     </div>
 
     <div class="invoice-box">
-        <div class="input-row" style="display: flex; gap: 15px; align-items: flex-end; margin-bottom: 25px;">
-            <div class="search-container" style="flex: 2; position: relative;">
-                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #475569;">ابحث عن منتج أو اكتب اسم صنف جديد</label>
-                <div style="display: flex; gap: 8px;">
-                    <div class="search-container" style="position: relative; flex: 1;">
-    <input type="text" id="purchase-search" 
-           placeholder="أدخل إسم المنتج هنا ..." 
-           oninput="searchProduct(this.value, 'وارد')" 
-           onkeydown="if(event.key === 'Enter') handleManualEntry()"
-           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
-    
-    <div id="purchase-results" class="search-results-box"></div>
-</div>
+        <div class="modern-card supplier-card">
+            <div class="input-group-fixed">
+                <label class="field-label">اسم المورد / الشركة</label>
+                <i class="fas fa-building icon-left"></i>
+                    <input type="text" id="supplier-name" placeholder="ادخل اسم المورد...">
+                <div class="input-with-icon">
                     
-                    <button class="btn btn-blue" onclick="handleManualEntry()" 
-                            style="padding: 0 20px; height: 48px; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-plus"></i> إضافة للفاتورة
-                    </button>
                 </div>
-                <div id="purchase-results" class="search-results-box" 
-                 style="position: absolute; top: 100%; left: 0; right: 85px; background: white; z-index: 1000; border: 1px solid #ddd; display: none; max-height: 200px; overflow-y: auto;">
-                </div>
-            </div>
-            
-            <div class="supplier-box" style="flex: 1;">
-                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #475569;">اسم المورد</label>
-                <input type="text" id="supplier-name" placeholder="اسم الشركة أو المورد" 
-                    style="padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; width: 100%;">
             </div>
         </div>
 
-        <div class="table-container" style="background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-            <table id="purchase-table" class="invoice-table" style="width: 100%; border-collapse: collapse;">
-                <thead style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                    <tr>
-                        <th style="padding: 15px; text-align: right;">المنتج</th>
-                        <th style="padding: 15px; text-align: center; width: 150px;">سعر الشراء</th>
-                        <th style="padding: 15px; text-align: center; width: 150px;">سعر البيع</th>
-                        <th style="padding: 15px; text-align: center; width: 100px;">الكمية</th>
-                        <th style="padding: 15px; text-align: center; width: 120px;">الإجمالي</th>
-                        <th style="padding: 15px; text-align: center; width: 50px;">حذف</th>
-                    </tr>
-                </thead>
-                <tbody style="min-height: 100px;">
-                    </tbody>
-            </table>
-        </div>
+        <div class="modern-card entry-grid-card">
+            <div class="entry-grid">
+                <div class="input-field-wrapper search-wrapper">
+                    <label class="field-label-sm">المنتج</label>
+                    <input type="text" id="purchase-search" placeholder="البحث ..." 
+                           oninput="window.searchWithLocation(this.value)" 
+                           onkeydown="window.handlePurchaseKeys(event)">
+                    <div id="purchase-results" class="search-results-box"></div>
+                </div>
 
-        <div class="invoice-footer" style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center; padding: 20px; background: #f0fdf4; border-radius: 12px;">
-            <div class="total-area">
-                <span style="color: #166534; font-weight: bold;">إجمالي الفاتورة المستحق:</span>
-                <h2 id="purchase-final-total" style="margin: 5px 0 0 0; color: #15803d; font-size: 2rem;">0.00 <small style="font-size: 1rem;">ج.م</small></h2>
-            </div>
-            <div class="actions">
-                <button class="btn btn-green" onclick="processSmartPurchase()" 
-                        style="padding: 15px 40px; font-size: 1.1rem; background: #10b981; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4);">
-                    <i class="fas fa-save"></i> حفظ في المخزن 
+                <div class="input-field-wrapper">
+                    <label class="field-label-sm">الكمية</label>
+                    <input type="number" id="purchase-qty-input" value="1" 
+                           onkeydown="window.handlePurchaseKeys(event)" class="text-center">
+                </div>
+
+                <div class="input-field-wrapper">
+                    <label class="field-label-sm color-buy">سعر الشراء</label>
+                    <input type="number" id="purchase-buy-price" value="0" 
+                           onkeydown="window.handlePurchaseKeys(event)" class="text-center bg-buy">
+                </div>
+
+                <div class="input-field-wrapper">
+                    <label class="field-label-sm color-sell">سعر البيع</label>
+                    <input type="number" id="purchase-sell-price" value="0" 
+                           onkeydown="window.handlePurchaseKeys(event)" class="text-center bg-sell">
+                </div>
+
+                <div class="input-field-wrapper">
+                    <label class="field-label-sm">المخزن</label>
+                    <select id="target-warehouse" class="modern-select">
+                        <option value="المخزن الرئيسي">المخزن الرئيسي</option>
+                        <option value="مخزن العرض">مخزن العرض</option>
+                    </select>
+                </div>
+
+                <div class="input-field-wrapper">
+                    <label class="field-label-sm">القسم</label>
+                    <select id="target-category" class="modern-select"></select>
+                </div>
+
+                <button class="add-btn" onclick="addNewItemToPurchaseTable()" 
+                        onkeydown="window.handlePurchaseKeys(event)">
+                    <i class="fas fa-plus"></i>
                 </button>
             </div>
         </div>
+            <div class="invoice-summary-bar">
+            <div class="total-display">
+                <span class="total-label">إجمالي فاتورة الوارد:</span>
+                <h2 id="purchase-final-total" class="total-amount">0.00 <small>ج.م</small></h2>
+            </div>
+            <button class="btn-approve" onclick="window.processSmartPurchase()">
+                <i class="fas fa-file-invoice-dollar"></i> حفظ 
+            </button>
+        </div>
+        <div class="table-container-modern">
+            <table id="purchase-table">
+                <thead>
+                    <tr>
+                        <th>المنتج</th>
+                        <th>المخزن/القسم</th>
+                        <th>سعر الشراء</th>
+                        <th>سعر البيع</th>
+                        <th>الكمية</th>
+                        <th>الإجمالي</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        
     </div>
 </section>
-<section id="reports" class="content-section" style="display:none;">
+<section id="reports" class="content-section" >
     <div class="glass-header">
         <div class="title-area">
-            <h1>سجل العمليات</h1>
-            <p>تتبع حركة الوارد والصادر بدقة</p>
+            <h1>سجل الفواتير</h1>
         </div>
         
         <div class="filter-area">
-            <div class="search-box-history">
+            <div class="search-box-history" style="    width: 470px;">
                 <i class="fas fa-search"></i>
-                <input type="text" id="filter-name" placeholder="ابحث بالاسم..." oninput="applyAllFilters()">
+                <input type="text" id="filter-name" onkeyup="filterInvoices()" placeholder="ابحث باسم المورد أو رقم العملية...">
             </div>
 
             <div class="row-filters">
@@ -278,8 +427,8 @@
                 </div>
 
                 <div class="filter-buttons">
-                    <button class="btn-filter active" onclick="setRecordType('الكل', this)">الكل</button>
-                    <button class="btn-filter" onclick="setRecordType('وارد', this)">الوارد</button>
+                    <button class="btn-filter" onclick="setRecordType('الكل', this)">الكل</button>
+                   <button class="btn-filter" onclick="setRecordType('وارد', this)">الوارد</button>
                     <button class="btn-filter" onclick="setRecordType('صادر', this)">الصادر</button>
                 </div>
             </div>
@@ -304,7 +453,7 @@
         </table>
     </div>
 </section> 
-<section id="dashboard-section" class="content-section" style="display:none;">
+    <section id="dashboard-section" class="content-section" >
     <div class="glass-header">
         <div class="title-area">
             <h1><i class="fas fa-chart-line"></i> لوحة التحكم والتقارير</h1>
@@ -347,15 +496,63 @@
     </div>
 
     <div class="security-card full-width">
-        <div class="security-header"><i class="fas fa-lock"></i> <h3>إعدادات الأمان والشركة</h3></div>
-        <div class="security-body">
-            <div class="input-full"><label>اسم الشركة</label><input type="text" id="new-company-name"></div>
-            <div class="security-row">
-                <div class="input-item"><label>باسوورد البرنامج</label><input type="password" id="new-main-pass"></div>
-                <div class="input-item"><label>باسوورد اللوحة</label><input type="password" id="new-dash-pass"></div>
-                <div class="input-item"><label>باسوورد المخزن</label><input type="password" id="new-inv-pass"></div>
+    <div class="security-header"><i class="fas fa-user-shield"></i> <h3>إدارة النظام والشركة</h3></div>
+    <div class="security-body">
+        <div class="config-section">
+            <label class="section-label">اسم الشركة</label>
+            <div class="input-with-btn">
+                <input type="text" id="new-company-name" placeholder="ادخل اسم الشركة">
+                <button class="btn-action save" onclick="updateCompanyName()"><i class="fas fa-check"></i> حفظ</button>
             </div>
-            <button class="btn-save-all" onclick="saveNewPasswords()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+        </div>
+        <hr class="divider">
+        <div class="control-grid">
+            <button class="btn-main-action" onclick="toggleUserModal(true)">
+                <i class="fas fa-users-cog"></i> إدارة المستخدمين
+            </button>
+            <button class="btn-main-action secondary" onclick="togglePassModal(true)">
+                <i class="fas fa-key"></i> الأرقام السرية للأقسام
+            </button>
+            <button class="btn-danger-glow" onclick="openResetModal()" style="min-width: 150px;">
+        <i class="fas fa-trash-alt" style="font-size: 1.2rem;"></i>
+        <span>إعادة تهيئة النظام</span>
+    </button>
+        </div>
+    </div>
+</div>
+</section>
+    <section id="settings-section" class="content-section">
+    <div class="glass-header">
+        <h1><i class="fas fa-tools"></i> إعدادات المنظومة</h1>
+    </div>
+
+    <div class="settings-grid">
+        <div class="setting-card">
+            <div class="setting-icon"><i class="fas fa-percentage"></i></div>
+            <div class="setting-info">
+                <h3>الخصم الافتراضي</h3>
+                <p>نسبة الخصم التي تظهر تلقائياً في الفواتير</p>
+                <div class="input-group">
+                    <input type="number" id="set-discount-input" placeholder="0">
+                    <button onclick="saveDefaultDiscount()"><i class="fas fa-save"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-card full-width">
+            <h3><i class="fas fa-database"></i> إدارة النسخ الاحتياطية</h3>
+            <div class="db-actions">
+                <button class="db-btn export" onclick="exportDatabase()">
+                    <i class="fas fa-cloud-download-alt"></i> تصدير نسخة احتياطية (Export)
+                </button>
+
+                <div class="import-wrapper">
+                    <button class="db-btn import" onclick="document.getElementById('import-file').click()">
+                        <i class="fas fa-cloud-upload-alt"></i> استيراد نسخة قديمة (Import)
+                    </button>
+                    <input type="file" id="import-file" style="display:none" onchange="importDatabase(event)">
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -368,18 +565,7 @@
     </div>
 </div>
 
-<div id="logs-modal" class="modal-overlay">
-    <div class="modal-content wide-modal">
-        <div class="modal-header"><h3 id="logs-modal-title">السجل</h3><span class="close" onclick="closeLogsModal()">&times;</span></div>
-        <div class="modal-search"><i class="fas fa-search"></i><input type="text" id="logs-search-input" onkeyup="filterLogsTable()" placeholder="بحث في السجل..."></div>
-        <div class="modal-list-body">
-            <table class="logs-table">
-                <thead id="logs-table-head"></thead>
-                <tbody id="logs-table-body"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
+
    </main>
 
     <div id="productModal" class="modal">
@@ -432,7 +618,7 @@
 </div>
 <div class="status-bar">
     <div id="live-clock"></div>
-    <div>المستخدم: مدير النظام</div>
+    <div id="user">المستخدم: مدير النظام</div>
     <div class="status-online">متصل (قاعدة بيانات محلية)</div>
 </div>
 <div id="people-modal" class="modal-overlay">
@@ -454,25 +640,161 @@
         </div>
     </div>
 </div>
-<style>
-.status-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 30px;
-    background: #34495e;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 20px;
-    align-items: center;
-    font-size: 12px;
-    z-index: 1000;
-}
-</style>
-    <script src="js/script.js"></script>
-    <script src="js/script2.js"></script>
+
+<div id="reset-modal" class="modal">
+    <div class="modal-content" style="max-width: 450px; border-radius: 20px; border: none; overflow: hidden;">
+        <div class="modal-header" style="background: linear-gradient(45deg, #c0392b, #e74c3c); color: white; padding: 20px; text-align: center;">
+            <h2 style="margin:0; font-size: 1.4rem;"><i class="fas fa-radiation"></i> مركز التحكم في البيانات</h2>
+        </div>
+        <div class="modal-body" style="padding: 25px; background: #f9f9f9;">
+            <div class="reset-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                <label class="reset-card"><input type="checkbox" class="reset-chk" value="warehouses"> المخازن</label>
+                <label class="reset-card"><input type="checkbox" class="reset-chk" value="categories"> الأقسام</label>
+                <label class="reset-card"><input type="checkbox" class="reset-chk" value="products"> المنتجات</label>
+                <label class="reset-card"><input type="checkbox" class="reset-chk" value="customers"> العملاء</label>
+                <label class="reset-card"><input type="checkbox" class="reset-chk" value="suppliers"> الموردين</label>
+                <label class="reset-card"><input type="checkbox" class="reset-chk" value="purchase_history"> سجل المشتريات</label>
+<label class="reset-card">
+    <input type="checkbox" class="reset-chk" value="sales_history" id="chk-sales" onclick="syncResetFields('sales')"> سجل المبيعات
+</label>
+
+<label class="reset-card">
+    <input type="checkbox" class="reset-chk" value="profit_logs" id="chk-profit" onclick="syncResetFields('profit')"> الأرباح
+</label>
+            </div>
+
+            <div style="border-top: 2px dashed #ddd; margin: 15px 0; padding-top: 15px;">
+                <label style="color: #c0392b; font-weight: bold; cursor: pointer;">
+                    <input type="checkbox" id="full-reset-chk" onchange="toggleFullReset(this)"> <i class="fas fa-bomb"></i> إعادة تهيئة كاملة للنظام
+                </label>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <input type="password" id="reset-pass-input" placeholder="كلمة سر الإدارة للتأكيد" 
+                       style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s;">
+            </div>
+        </div>
+        <div class="modal-footer" style="padding: 20px; background: #fff; display: flex; gap: 10px;">
+            <button class="action-btn delete" style="flex: 2; height: 45px; font-weight: bold;" onclick="executeSystemReset()">تأكيد العملية</button>
+            <button class="action-btn" style="flex: 1; background: #95a5a6;" onclick="closeModal('reset-modal')">تراجع</button>
+        </div>
+    </div>
+</div>
+<div id="user-management-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-users-cog"></i> إدارة مستخدمي النظام</h3>
+            <button class="close-btn" onclick="toggleUserModal(false)">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="user-entry-form">
+                <input type="hidden" id="edit-user-id">
+                <div class="input-row">
+                    <input type="text" id="manage-user-name" placeholder="اسم المستخدم">
+                    <input type="password" id="manage-user-pass" placeholder="كلمة المرور">
+                </div>
+                
+                <div class="modal-btns-grid">
+                    <div id="edit-actions" style="display:none; gap:10px;">
+    <button class="btn-success" onclick="updateUser()">حفظ التعديل</button>
+    <button class="btn-secondary" onclick="resetUserForm()">إلغاء</button>
+</div>
+
+                    <button id="btn-add-user" class="btn-modal btn-add-new" onclick="addUser()">
+                        <i class="fas fa-plus"></i> إضافة مستخدم
+                    </button>
+                    
+                    <button id="btn-update-user" class="btn-modal btn-save-edit" style="display:none;" onclick="updateUser()">
+                        <i class="fas fa-save"></i> حفظ التعديل
+                    </button>
+                    <button id="btn-cancel-edit" class="btn-modal btn-cancel-modal" style="display:none;" onclick="resetUserForm()">
+                        إلغاء
+                    </button>
+                </div>
+            </div>
+
+            <div class="user-table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>التحكم</th>
+                            <th>المستخدم</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-list-table">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="pass-management-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-key"></i> الأرقام السرية للأقسام</h3>
+            <button class="close-btn" onclick="togglePassModal(false)">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="user-entry-form">
+    <label>باسوورد المخزن</label>
+    <input type="password" id="new-inv-pass" placeholder="اتركه فارغاً لعدم التغيير">
+    
+    <label style="margin-top:10px; display:block;">باسوورد لوحة التحكم</label>
+    <input type="password" id="new-dash-pass" placeholder="اتركه فارغاً لعدم التغيير">
+    
+    <button class="btn-primary" onclick="saveSystemPass()" style="margin-top:20px; width:100%;">
+        <i class="fas fa-save"></i> حفظ التغييرات
+    </button>
+</div>
+        </div>
+    </div>
+</div>
+<div id="section-auth-modal" class="modal-overlay" style="display:none; z-index: 9999;">
+    <div class="modal-content" style="width: 300px; text-align: center;">
+        <div class="modal-header">
+            <h3><i class="fas fa-lock"></i> دخول آمن</h3>
+        </div>
+        <div class="modal-body">
+            <p id="auth-message" style="margin-bottom: 15px; font-size: 0.9rem; color: #666;">برجاء إدخال كلمة السر</p>
+            <input type="password" id="auth-section-pass" class="login-input" placeholder="••••" 
+                   style="width: 100%; text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn-primary" id="confirm-auth-btn" style="flex: 2;">دخول</button>
+                <button class="btn-secondary" onclick="closeAuthModal()" style="flex: 1;">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="logs-modal" class="modal">
+    <div class="modal-content" style="max-width: 600px; border-radius: 15px;">
+        <div class="modal-header" style="background: #27ae60; color: white; padding: 15px; border-radius: 15px 15px 0 0;">
+            <h2 id="logs-modal-title" style="margin:0; font-size: 1.2rem;"></h2>
+            <button class="close-btn" onclick="closeModal('logs-modal')" style="color:white; background:none; border:none; font-size: 1.5rem; cursor:pointer;">&times;</button>
+        </div>
+        <div class="modal-body" id="logs-modal-body" style="padding: 20px; max-height: 450px; overflow-y: auto;">
+    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+    <input type="text" id="logGeneralSearch" oninput="liveSearchLogs()" placeholder="ابحث بالتاريخ (2026-02) أو بالمبلغ..." style="flex: 2; padding: 8px; border: 1px solid #ddd; border-radius: 5px; text-align: right;">
+    
+    <button onclick="openLogsModal('profit', 'day')" style="flex: 0.5; padding: 8px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">يومي</button>
+    <button onclick="openLogsModal('profit', 'month')" style="flex: 0.5; padding: 8px; background: #2980b9; color: white; border: none; border-radius: 5px; cursor: pointer;">شهري</button>
+</div>>
+
+    <div id="logs-table-container"></div>
+</div>
+        <div class="modal-footer" style="padding: 15px; text-align: left;">
+            <button class="action-btn" style="background: #95a5a6;" onclick="closeModal('logs-modal')">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
+    <!-- <script src="js/script.js"></script> -->
+    <!-- <script src="js/script2.js"></script> -->
+    <!-- <script src="js/script3.js"></script> -->
+    <script src="js/script4.js"></script>
+    <script src="js/setting.js"></script>
 
 </body>
 </html>

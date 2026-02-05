@@ -1,38 +1,63 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
+
+// 1. 🔥 تفعيل الـ Live Reload (زي اللايف سيرفر بالظبط)
+try {
+  require('electron-reloader')(module, {
+    debug: true,
+    watchRenderer: true // بيراقب الـ HTML والـ JS والـ CSS
+  });
+} catch (err) {
+  console.log('Hot Reload Error:', err);
+}
+
+let win;
 
 function createWindow() {
-  // إعدادات النافذة الأساسية
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1200,
     height: 800,
-    // أيقونة التطبيق (تأكد من وجود ملف icon.ico في الفولدر)
     icon: path.join(__dirname, 'icon.ico'),
     webPreferences: {
-      // ده أهم جزء عشان الكود بتاعك يفضل شغال لوكال بعد البناء
       nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true
+      contextIsolation: false, // عشان الـ Renderer يكلم الـ Main براحته
     }
   });
 
-  // تحميل الملف الرئيسي
   win.loadFile('index.html');
-
-  // إلغاء القائمة العلوية الافتراضية (عشان يبان تطبيق احترافي)
-  // win.setMenu(null); 
 }
 
-// تشغيل التطبيق
-app.whenReady().then(() => {
-  createWindow();
+// --- مسار قاعدة البيانات الموحد في الـ AppData ---
+const getDbPath = () => path.join(app.getPath('userData'), 'system_data.db');
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+// 2. 📥 استقبال وحفظ الداتا (Save)
+ipcMain.on('save-db-to-disk', (event, buffer) => {
+    try {
+        fs.writeFileSync(getDbPath(), Buffer.from(buffer));
+        console.log("✅ Database Saved to:", getDbPath());
+    } catch (err) {
+        console.error("❌ Save Error:", err);
+    }
 });
 
-// إغلاق البرنامج بالكامل عند قفل النافذة
+// 3. 📤 إرسال الداتا للريندرر عند التشغيل (Load)
+ipcMain.handle('load-db-from-disk', async () => {
+    const dbPath = getDbPath();
+    if (fs.existsSync(dbPath)) {
+        console.log("📂 Loading existing database...");
+        return fs.readFileSync(dbPath);
+    }
+    console.log("🆕 No database found, starting fresh.");
+    return null;
+});
+
+// 4. إرسال المسار (للاحتياط)
+ipcMain.handle('get-db-path', () => getDbPath());
+
+// تشغيل البرنامج
+app.whenReady().then(createWindow);
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });

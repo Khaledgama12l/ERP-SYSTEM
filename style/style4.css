@@ -1,0 +1,349 @@
+/* 1. التنسيق العام للموديلات (الخلفية الشفافة) */
+.modal, .modal-overlay {
+    display: none; /* مخفي افتراضياً */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(4px); /* تنعيم الخلفية */
+}
+
+/* 2. حاوية المحتوى داخل كل موديل */
+.modal-content {
+    background-color: #1e293b;
+    color: #f1f5f9;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    position: relative;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    direction: rtl;
+}
+
+/* 3. شريط الحالة السفلي (Status Bar) */
+.status-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: #020617;
+    border-top: 1px solid #1e293b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 12px;
+    color: #94a3b8;
+    z-index: 1000;
+}
+
+.status-online { color: #10b981; }
+
+/* 4. تنسيق المدخلات داخل الموديلات */
+.modal-content input, 
+.modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 14px;
+}
+
+/* 5. تنسيق الجداول داخل الموديلات (مثل إدارة الأقسام) */
+.table-container {
+    margin-top: 15px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: right;
+}
+
+th { background: #0f172a; padding: 10px; color: #38bdf8; }
+td { padding: 8px 10px; border-top: 1px solid #334155; }
+
+/* 6. ززر الإغلاق (X) */
+.close, .close-btn, .close-modal {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.close:hover { color: #ef4444; }
+
+/* 7. تنسيق شبكة كروت الريسيت (Reset Cards) */
+.reset-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.reset-card {
+    background: #0f172a;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+/* 8. الأزرار داخل الموديلات */
+.btn, .action-btn, .btn-primary {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-blue { background: #3b82f6; color: #fff; }
+.btn-red, .btn-delete, .delete { background: #ef4444; color: #fff; }
+.btn-purple { background: #8b5cf6; color: #fff; }
+
+/* 9. تخصيص موديل الحماية (Auth) */
+.auth-modal {
+    text-align: center;
+}
+.auth-icon {
+    font-size: 40px;
+    color: #38bdf8;
+    margin-bottom: 10px;
+}
+/* تنسيق القائمة الجانبية - Sidebar */
+.sidebar {
+    width: 220px;
+    background-color: #020617;
+    height: 100vh;
+    position: fixed;
+    right: 0;
+    top: 0;
+    border-left: 1px solid #1e293b;
+    z-index: 1000;
+    padding-top: 15px;
+}
+
+/* تنسيق عناصر القائمة */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-right: 3px solid transparent;
+    font-size: 14px;
+}
+
+/* أيقونات القائمة */
+.nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* حالة العنصر النشط */
+.nav-item.active {
+    background-color: #1e293b;
+    color: #38bdf8;
+    border-right-color: #38bdf8;
+}
+
+/* حالة التمرير (Hover) */
+.nav-item:hover {
+    background-color: #0f172a;
+    color: #f1f5f9;
+}
+
+/* 1. تنسيق الحاوية الرئيسية */
+.main-content {
+    margin-right: 220px; /* نفس عرض السايد بار اللي عملناه */
+    padding: 20px;
+    padding-bottom: 50px; /* مساحة عشان الـ status bar */
+    min-height: 100vh;
+}
+
+/* 2. تنسيق الأقسام (إخفاء الكل واظهار النشط) */
+.content-section {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 3. تنسيق الكروت (Welcome, Inventory Header, Invoice) */
+.welcome-card, .glass-header, .invoice-container, .modern-card, .security-card, .invoice-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* 4. تنسيق شاشة الترحيب (Welcome) */
+.welcome-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    text-align: center;
+}
+
+.company-logo-wrapper i {
+    font-size: 50px;
+    color: #38bdf8;
+    margin-bottom: 15px;
+}
+
+.welcome-stats-mini {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.mini-stat {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 10px;
+    min-width: 120px;
+}
+
+/* 5. تنسيق الجداول (Inventory & Reports) */
+.table-container {
+    background: #1e293b;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #334155;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: #0f172a;
+    color: #38bdf8;
+    padding: 12px 15px;
+    text-align: right;
+    font-size: 14px;
+}
+
+td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+tr:hover { background: #334155; }
+
+/* 6. شبكة لوحة التحكم (Dashboard Grid) */
+.dash-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.card-stat {
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.sales-card { background: linear-gradient(135deg, #1e40af, #3b82f6); }
+.profit-card-daily { background: linear-gradient(135deg, #065f46, #10b981); }
+.profit-card-monthly { background: linear-gradient(135deg, #5b21b6, #8b5cf6); }
+.warning-card { background: linear-gradient(135deg, #92400e, #f59e0b); }
+
+/* 7. مدخلات الفواتير (Invoice Inputs) */
+.invoice-meta-grid, .entry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.search-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-group i {
+    position: absolute;
+    right: 10px;
+    color: #64748b;
+}
+
+.search-input-group input, .search-input-group select {
+    width: 100%;
+    padding: 10px 35px 10px 10px; /* مساحة للأيقونة يمين */
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: white;
+}
+
+/* 8. أزرار التحكم السريع */
+.control-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ctrl-card {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #334155;
+    transition: 0.2s;
+}
+
+.ctrl-card:hover { border-color: #38bdf8; background: #334155; }
+
+/* 9. شاشات البحث المنبثقة (Dropdowns) */
+.search-results-dropdown, .search-results-box {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1e293b;
+    border: 1px solid #334155;
+    z-index: 100;
+    max-height: 200px;
+    overflow-y: auto;
+    border-radius: 0 0 8px 8px;
+}
+
+

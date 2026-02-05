@@ -1,6 +1,6 @@
 {
   "name": "erp-system",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "ERP System Project",
   "author": "Khaled",
   "main": "main.js",
@@ -9,13 +9,25 @@
     "dist": "electron-builder"
   },
   "devDependencies": {
-    "electron": "34.0.1",
-    "electron-builder": "^24.13.3"
+    "electron": "^34.0.1",
+    "electron-builder": "^25.1.8",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-reloader": "^1.2.3"
   },
   "build": {
     "appId": "com.khaled.erp",
+    "directories": {
+      "output": "dist"
+    },
     "win": {
-      "target": "nsis"
-    }
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "files": [
+      "**/*",
+      "!dist/*",
+      "!node_modules/*"
+    ],
+    "asar": true
   }
 }
