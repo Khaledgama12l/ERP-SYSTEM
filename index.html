@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    
     <meta charset="UTF-8">
     <title>نظام إدارة المبيعات </title>
     <link rel="stylesheet" href="style/style.css">
@@ -8,14 +9,13 @@
     <link rel="stylesheet" href="style/style3.css">
     <!-- <link rel="stylesheet" href="style/style4.css"> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon.ico">
+    
+    <link rel="icon" type="image/x-icon" href="icon.ico">
 </head>
 <body>
     <!-- <div id="main-login-overlay">
-    
-    
-
     <div class="login-side-form">
         <div class="login-header">
             <h2>مرحباً بك</h2>
@@ -24,12 +24,12 @@
 
         <div class="input-group">
             <label>اسم المستخدم</label>
-            <input type="text" id="main-username" value="admin" class="login-input">
+            <input type="text" id="main-username" class="login-input" autocomplete="username">
         </div>
 
         <div class="input-group">
             <label>كلمة المرور</label>
-            <input type="password" id="main-pass" placeholder="••••••••" class="login-input">
+            <input type="password" id="main-pass" placeholder="••••••••" class="login-input" tabindex="1" autocomplete="current-password">
         </div>
 
         <button onclick="checkMainPass()" class="btn-login">
@@ -42,31 +42,44 @@
 
 <aside class="sidebar">
     <nav>
-        <div class="nav-item active" onclick="showSection('welcome-section')">
+        <div id="nav-welcome" class="nav-item active" onclick="showSection('welcome-section')">
             <i class="fas fa-home"></i> <span>الرئيسية</span>
         </div>
         
-        <div class="nav-item" onclick="showSection('sales')">
+        <div id="nav-sales" class="nav-item" onclick="showSection('sales')">
             <i class="fas fa-shopping-cart"></i> <span>فاتورة بيع</span>
         </div>
         
-        <div class="nav-item" onclick="showSection('purchase')">
+        <div id="nav-purchase" class="nav-item" onclick="showSection('purchase')">
             <i class="fas fa-truck-loading"></i> <span>فاتورة وارد</span>
         </div>
         
-        <div class="nav-item" onclick="showSection('reports')">
+        <div id="nav-customers" class="nav-item" onclick="showSection('customers')">
+            <i class="fas fa-person"></i> <span>سجل العملاء</span>
+        </div>
+
+        <div id="nav-reports" class="nav-item" onclick="showSection('reports')">
             <i class="fas fa-history"></i> <span>سجل الفواتير</span>
         </div>
         
-        <div class="nav-item"  onclick="checkPassAndShow('inventory', 'inv_pass')"> 
+        <div id="nav-inventory" class="nav-item" onclick="showSection('inventory')">
             <i class="fas fa-boxes"></i> <span>المخزن</span>
         </div>
         
-        <div class="nav-item" onclick="checkPassAndShow('dashboard-section', 'dash_pass')">
+        <div id="nav-dashboard" class="nav-item" onclick="showSection('dashboard-section')">
             <i class="fas fa-chart-line"></i> <span>لوحة التحكم</span>
         </div>
-        <div class="nav-item" onclick="showSection('settings-section')">
+
+        <div id="nav-settings" class="nav-item" onclick="showSection('settings-section')">
             <i class="fas fa-cog"></i> <span>الإعدادات</span>
+        </div>
+
+        <div id="nav-calc" class="nav-item" onclick="openCalculator('calculator')">
+            <i class="fas fa-calculator"></i> <span>الة حاسبة</span>
+        </div>
+
+        <div class="nav-item" onclick="logOut()">
+            <i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span>
         </div>
     </nav>
 </aside>
@@ -96,7 +109,7 @@ onclick="showSection('inventory')" -->
                 </div>
             </div>
 
-            <div class="quick-access-wrapper">
+            <div class="quick-access-wrapper f-feature-disabled ">
                 <button id="quick-btn-1" class="btn-quick" title="وصول سريع 1">
                     <i class="fas fa-rocket"></i> اختصار 1
                 </button>
@@ -104,7 +117,7 @@ onclick="showSection('inventory')" -->
                     <i class="fas fa-th-large"></i> اختصار 2
                 </button>
             </div>
-        </div>
+        </div> 
     </div>
 </section> 
         
@@ -162,7 +175,9 @@ onclick="showSection('inventory')" -->
         <h2><i class="fas fa-plus-circle"></i> إضافة منتج جديد</h2>
         <div class="grid-form">
             <input type="text" id="p-name" placeholder="اسم المنتج">
-            <select id="p-warehouse-select"></select> <select id="p-category-select"></select>  <input type="number" id="p-qty" placeholder="الكمية">
+            <select id="p-warehouse-select">
+    <option>جاري التحميل...</option>
+</select> <select id="p-category-select"></select>  <input type="number" id="p-qty" placeholder="الكمية">
             <input type="number" id="p-buy" placeholder="سعر الشراء">
             <input type="number" id="p-sell" placeholder="سعر البيع">
         </div>
@@ -216,41 +231,90 @@ onclick="showSection('inventory')" -->
 
 
 
-<section id="sales" class="content-section">
+        <section id="sales" class="content-section">
     <div class="glass-header">
         <div class="title-area">
             <h1><i class="fas fa-shopping-cart"></i> فاتورة بيع</h1>
+            
         </div>
     </div>
 
     <div class="invoice-container">
+        <div id="sale-tabs-container" style="display: flex; gap: 5px; margin-bottom: 10px;">
+    </div>
+    <div id="original-inv-section" class="input-item" style="display: none; background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+    <label style="color: #e74c3c;">رقم الفاتورة الأصلية</label>
+    <div class="search-input-group">
+        <i class="fas fa-receipt" style="color: #e74c3c;"></i>
+        <input type="text" id="original-inv-id" placeholder="ادخل رقم الفاتورة للارتجاع..." onkeydown="if(event.key==='Enter') fetchInvoiceForReturn()">
+        <button class="btn-fetch" onclick="fetchInvoiceForReturn()" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; cursor: pointer;border-radius: 15px;">جلب</button>
+    </div>
+</div>
         <div class="invoice-meta-grid top-meta">
             <div class="input-item">
                 <label>اسم العميل</label>
                 <div class="search-input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="sale-customer-name" placeholder="أدخل اسم العميل...">
+                    <input type="text" id="sale-customer-name" placeholder="أدخل اسم العميل..." oninput="updateCurrentTabData()">
                 </div>
             </div>
             <div class="input-item">
                 <label>رقم الهاتف</label>
                 <div class="search-input-group">
                     <i class="fas fa-phone"></i>
-                    <input type="text" id="sale-customer-phone" placeholder="رقم الهاتف">
+                    <input type="text" id="sale-customer-phone" placeholder="رقم الهاتف" oninput="updateCurrentTabData()">
                 </div>
             </div>
+            
             <div class="input-item">
-                <label>طريقة الدفع</label>
-                <div class="search-input-group">
-                    <i class="fas fa-wallet"></i>
-                    <select id="sale-payment-method">
-                        <option value="cash">نقدي (Cash)</option>
-                        <option value="card">فيزا (Visa)</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+    <label>طريقة الدفع</label>
+    <div class="search-input-group">
+        <i class="fas fa-wallet"></i>
+        <select id="sale-payment-method" onchange="toggleCreditSection()">
+            <option value="cash">نقدي (Cash)</option>
+            <option value="card">فيزا (Visa)</option>
+            <option value="credit">آجل (Credit)</option> </select>
+    </div>
+    <div class="return-mode-toggle" style="margin-right: auto; display: flex; align-items: center; gap: 10px;">
+    <span id="return-label" style="font-weight: bold; color: #666;">وضع البيع</span>
+    <label class="f-switch">
+        <input type="checkbox" id="return-mode-switch" onchange="toggleReturnMode()">
+        <span class="f-slider reverse"></span>
+    </label>
+</div>
+</div>
 
+<div id="credit-details-section" class="input-item" style="display: none; border: 1px dashed #3498db; padding: 5px; border-radius: 8px;">
+    <div style="display: flex; gap: 10px;">
+        <div>
+            <label style="font-size: 10px;">المدفوع</label>
+            <input type="number" id="sale-paid-amount" value="0" class="mini-input" style="width: 80px;" oninput="calculateTotal()">
+        </div>
+        <div>
+            <label style="font-size: 10px;">المتبقي</label>
+            <input type="number" id="sale-remaining-amount" value="0" class="mini-input" style="width: 80px;" disabled>
+        </div>
+    </div>
+</div>
+        </div>
+<div id="original-invoice-preview" style="display: none; background: #fff; border: 1px solid #e74c3c; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+    <div style="background: #e74c3c; color: white; padding: 5px 10px; font-size: 13px;">
+        <i class="fas fa-history"></i> محتويات الفاتورة الأصلية (للمراجعة فقط)
+    </div>
+    <div style="max-height: 150px; overflow-y: auto;">
+        <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 1px solid #eee;">
+                    <th style="padding: 5px;">المنتج</th>
+                    <th style="padding: 5px;">الكمية المباعة</th>
+                    <th style="padding: 5px;">السعر</th>
+                </tr>
+            </thead>
+            <tbody id="original-items-list" style="text-align: center;">
+                </tbody>
+        </table>
+    </div>
+</div>
         <div class="search-section-wrapper">
     <div class="search-box-wrapper" style="flex: 3;">
         <label>البحث عن منتج</label>
@@ -276,6 +340,25 @@ onclick="showSection('inventory')" -->
                     <h2 id="sale-grand-total">0.00</h2>
                 </div>
             </div>
+            <div class="advanced-calc-row">
+    <div id="ui-tax-section" class="calc-item" style="display: none;">
+        <label class="f-switch mini">
+            <input type="checkbox" id="apply-tax-switch" onchange="calculateTotal()">
+            <span class="f-slider"></span>
+        </label>
+        <span>ضريبة (%)</span>
+        <input type="number" id="temp-tax-val" value="14" class="mini-input" oninput="calculateTotal()">
+    </div>
+
+    <div id="ui-discount-section" class="calc-item" style="display: none; ">
+        <label class="f-switch mini">
+            <input type="checkbox" id="apply-discount-switch" onchange="calculateTotal()">
+            <span class="f-slider"></span>
+        </label>
+        <span>خصم</span>
+        <input type="number" id="temp-discount-val" style="color: black !important;" value="0" class="mini-input" oninput="calculateTotal()">
+    </div>
+</div>
             <div class="invoice-actions">
                 <div class="clear-btn-container" style="position: relative; display: inline-block;">
     <button class="btn btn-clear" onclick="showClearConfirm()">
@@ -321,16 +404,17 @@ onclick="showSection('inventory')" -->
     </div>
 
     <div class="invoice-box">
+        
         <div class="modern-card supplier-card">
-            <div class="input-group-fixed">
-                <label class="field-label">اسم المورد / الشركة</label>
-                <i class="fas fa-building icon-left"></i>
-                    <input type="text" id="supplier-name" placeholder="ادخل اسم المورد...">
-                <div class="input-with-icon">
-                    
-                </div>
-            </div>
+    <div class="input-group-fixed" style="position: relative; overflow: visible !important;">
+        <label class="field-label">اسم المورد / الشركة</label>
+        <div class="input-with-icon">
+            <input type="text" id="supplier-name" placeholder="ادخل اسم المورد..." autocomplete="off">
         </div>
+        <ul id="supplier-results" class="custom-dropdown"></ul>
+    </div>
+</div>
+
 
         <div class="modern-card entry-grid-card">
             <div class="entry-grid">
@@ -408,35 +492,133 @@ onclick="showSection('inventory')" -->
         
     </div>
 </section>
-<section id="reports" class="content-section" >
-    <div class="glass-header">
-        <div class="title-area">
-            <h1>سجل الفواتير</h1>
+
+
+
+
+        <section id="customers" class="content-section">
+            <div class="glass-header">
+                <div class="title-area">
+                    <h1>سجل العملاء</h1>
+                </div>
+            </div>
+            <div id="debt-screen" class="screen-content">
+    <h3>إدارة مديونيات العملاء</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>الاسم</th>
+                    <th>التليفون</th>
+                    <th>المديونية</th>
+                    <th>إجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="debt-list-body">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="paymentModal" class="modal">
+    <div class="modal-content">
+        <h4>تحصيل مبلغ من: <span id="pay-customer-name"></span></h4>
+        <input type="hidden" id="pay-customer-id">
+        <div class="f-field">
+            <label>المبلغ المدفوع:</label>
+            <input type="number" id="pay-amount" placeholder="0.00">
         </div>
-        
-        <div class="filter-area">
-            <div class="search-box-history" style="    width: 470px;">
-                <i class="fas fa-search"></i>
-                <input type="text" id="filter-name" onkeyup="filterInvoices()" placeholder="ابحث باسم المورد أو رقم العملية...">
+        <div class="f-field">
+            <label>ملاحظات:</label>
+            <input type="text" id="pay-note" placeholder="مثلاً: دفع جزء من الحساب">
+        </div>
+        <div class="modal-footer">
+        <button onclick="closeModal('paymentModal')" class="btn-modal btn-modal-secondary">إلغاء</button>
+        <button onclick="collectPayment()" class="btn-modal btn-modal-primary">تحصيل</button>
+    </div>
+    </div>
+</div>
+        </section>
+<div id="receiptPreviewModal" class="modal">
+    <div class="modal-content" style="width: 380px;">
+        <div style="background: #2c3e50; color: white; padding: 15px; text-align: center;">
+            <h4 style="margin:0;">معاينة إيصال الاستلام</h4>
+        </div>
+
+        <div id="receipt-printable-area" class="receipt-card">
+            <div class="receipt-header" style="text-align: center;">
+                <h3>فواتيري Pro</h3>
+                <small id="print-date"></small>
             </div>
 
-            <div class="row-filters">
-                <div class="date-filter">
-                    <i class="fas fa-calendar-alt"></i>
-                    <input type="date" id="filter-date" onchange="applyAllFilters()">
+            <div style="margin-top: 20px;">
+                <div class="receipt-info-row">
+                    <span>اسم العميل:</span>
+                    <b id="print-customer-name"></b>
                 </div>
+                <div class="receipt-info-row">
+                    <span>بيان الصرف:</span>
+                    <span id="print-note"></span>
+                </div>
+            </div>
 
-                <div class="filter-buttons">
-                    <button class="btn-filter" onclick="setRecordType('الكل', this)">الكل</button>
-                   <button class="btn-filter" onclick="setRecordType('وارد', this)">الوارد</button>
-                    <button class="btn-filter" onclick="setRecordType('صادر', this)">الصادر</button>
+            <div class="receipt-amount-box">
+                <div class="amount-label">المبلغ المستلم</div>
+                <div class="amount-value"><span id="print-amount"></span> ج.م</div>
+            </div>
+
+            <div style="text-align: center; font-size: 12px; color: #95a5a6; margin-top: 10px;">
+                <p>نحن نسعد دائماً بخدمتكم</p>
+                <div style="border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px;">
+                    توقيع الموظف: ....................
                 </div>
+            </div>
+        </div>
+
+        <div style="padding: 15px; background: #eee; display: flex; gap: 10px;">
+            <button onclick="printFinalReceipt()" class="btn-print-action" style="flex:2;">
+                طباعة الإيصال 🖨️
+            </button>
+            <button onclick="closeModal('receiptPreviewModal')" class="btn-cancel" style="flex:1;">
+                إغلاق
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+        <section id="reports" class="content-section" >
+<div class="glass-header">
+    <div class="title-area">
+        <h1>سجل الفواتير</h1>
+    </div>
+    
+    <div class="filter-area">
+        <div class="search-box-history">
+            <i class="fas fa-search"></i>
+            <input type="text" id="filter-name" onkeyup="filterInvoices()" placeholder="ابحث باسم المورد أو رقم العملية...">
+        </div>
+
+        <div class="row-filters">
+            <div class="date-filter">
+                <i class="fas fa-calendar-alt"></i>
+                <input type="date" id="filter-date" onchange="applyAllFilters()">
+            </div>
+
+            <div class="filter-buttons">
+                <button class="btn-filter active" onclick="setRecordType('الكل', this)">الكل</button>
+                <button class="btn-filter" onclick="setRecordType('وارد', this)">الوارد</button>
+                <button class="btn-filter" onclick="setRecordType('صادر', this)">الصادر</button>
+                <button class="btn-filter" onclick="setRecordType('مرتجع', this)">المرتجع</button>
             </div>
         </div>
     </div>
+</div>
 
-    <div class="table-container">
-        <table id="reports-table">
+    <div class="table-container" >
+        <table id="reports-table" >
             <thead>
                 <tr>
                     <th>رقم العملية</th>
@@ -487,10 +669,10 @@ onclick="showSection('inventory')" -->
         <div class="ctrl-card supplier-btn" onclick="openPeopleModal('suppliers')">
             <i class="fas fa-truck-loading"></i> <span>قائمة الموردين</span>
         </div>
-        <div class="ctrl-card profit-btn" onclick="openLogsModal('profit')">
+        <div class="ctrl-card profit-btn f-feature-disabled " onclick="openLogsModal('profit')">
             <i class="fas fa-history"></i> <span>سجل الأرباح</span>
         </div>
-        <div class="ctrl-card expense-btn" onclick="openLogsModal('expenses')">
+        <div class="ctrl-card expense-btn f-feature-disabled " onclick="openLogsModal('expenses')">
             <i class="fas fa-receipt"></i> <span>سجل المصروفات</span>
         </div>
     </div>
@@ -513,7 +695,7 @@ onclick="showSection('inventory')" -->
             <button class="btn-main-action secondary" onclick="togglePassModal(true)">
                 <i class="fas fa-key"></i> الأرقام السرية للأقسام
             </button>
-            <button class="btn-danger-glow" onclick="openResetModal()" style="min-width: 150px;">
+            <button class="btn-danger-glow f-feature-disabled" onclick="openResetModal()" style="min-width: 150px;">
         <i class="fas fa-trash-alt" style="font-size: 1.2rem;"></i>
         <span>إعادة تهيئة النظام</span>
     </button>
@@ -525,21 +707,7 @@ onclick="showSection('inventory')" -->
     <div class="glass-header">
         <h1><i class="fas fa-tools"></i> إعدادات المنظومة</h1>
     </div>
-
-    <div class="settings-grid">
-        <div class="setting-card">
-            <div class="setting-icon"><i class="fas fa-percentage"></i></div>
-            <div class="setting-info">
-                <h3>الخصم الافتراضي</h3>
-                <p>نسبة الخصم التي تظهر تلقائياً في الفواتير</p>
-                <div class="input-group">
-                    <input type="number" id="set-discount-input" placeholder="0">
-                    <button onclick="saveDefaultDiscount()"><i class="fas fa-save"></i></button>
-                </div>
-            </div>
-        </div>
-
-        <div class="setting-card full-width">
+    <div class="setting-card full-width">
             <h3><i class="fas fa-database"></i> إدارة النسخ الاحتياطية</h3>
             <div class="db-actions">
                 <button class="db-btn export" onclick="exportDatabase()">
@@ -554,6 +722,410 @@ onclick="showSection('inventory')" -->
                 </div>
             </div>
         </div>
+        <div class="setting-card full-width f-feature-disabled" id="printer-advanced-card">
+    <h3><i class="fas fa-print"></i> إعدادات الطابعة المتقدمة</h3>
+    
+    <div class="db-actions" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
+        
+        <div class="f-field" style="flex: 1; min-width: 200px;">
+    <small>اختر الطابعة</small>
+    <select id="printer_name_select">
+        <option value="">جاري تحميل الطابعات...</option>
+    </select>
+</div>
+
+        <div class="f-field" style="width: 150px;">
+            <small>اتجاة الورقة</small>
+            <select id="print_orientation">
+                <option value="portrait">طولي (Portrait)</option>
+                <option value="landscape">عرضي (Landscape)</option>
+            </select>
+        </div>
+
+        <div class="f-field" style="width: 150px;">
+            <small>نظام الطباعة</small>
+            <select id="print_duplex">
+                <option value="simplex">وجه واحد</option>
+                <option value="duplex">وجهين (Duplex)</option>
+            </select>
+        </div>
+
+        <div class="f-field" style="width: 100px;">
+            <small>عدد النسخ</small>
+            <input type="number" id="print_copies" value="1" min="1">
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 5px 15px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+            <label class="f-switch">
+                <input type="checkbox" id="silent_print">
+                <span class="f-slider"></span>
+            </label>
+            <span style="font-size: 0.85rem; font-weight: bold; color: #475569;">طباعة بدون معاينة</span>
+        </div>
+
+        <button class="db-btn export" onclick="saveAdvancedPrinterSettings()" style="height: 45px; background: #2563eb;">
+            <i class="fas fa-save"></i> حفظ الإعدادات
+        </button>
+    </div>
+</div>
+    <div class="features-grid">
+
+        <div class="f-erp-card-item">
+    <label class="f-main-label"><i class="fas fa-id-card"></i> 1. هوية المنشأة والبراند</label>
+    <div class="f-field">
+        <small>اسم المؤسسة (company_name)</small>
+        <input type="text" id="company_name" placeholder="مثال: شركة الهدى">
+    </div>
+    <div class="f-field">
+        <small>عنوان المؤسسة (store_address)</small>
+        <input type="text" id="store_address" placeholder="القاهرة">
+    </div>
+    <div class="f-field">
+        <small>رقم الهاتف (store_phone)</small>
+        <input type="text" id="store_phone" placeholder="010XXXXXXXX">
+    </div>
+    <div class="card-action-save">
+        <span class="f-status-badge">مربوط بجدول: settings</span>
+        <button class="f-save-btn" onclick="saveIdentitySettings()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+    </div>
+</div>
+        <div class="f-erp-card-item">
+    <label class="f-main-label"><i class="fas fa-tags"></i> 2. نظام الخصومات</label>
+    
+    <div class="f-field">
+        <small>نطاق الخصم (discount_scope)</small>
+        <select id="discount_scope">
+            <option value="total">خصم كلي</option>
+            <option value="per-item">خصم لكل قطعة</option>
+        </select>
+    </div>
+
+    <div class="f-field">
+        <small>نوع الخصم (discount_type)</small>
+        <select id="discount_type" onchange="updateDiscountPlaceholder()">
+            <option value="amount">مبلغ ثابت</option>
+            <option value="percent">نسبة مئوية</option>
+        </select>
+    </div>
+
+    <div class="f-field">
+        <small id="discount_value_label">قيمة الخصم</small>
+        <input type="number" id="discount_default_value" placeholder="أدخل القيمة...">
+    </div>
+
+    <div class="card-action-save">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <label class="f-switch">
+                <input type="checkbox" id="discount_status" onchange="saveSwitchSetting('discount_status')">
+                <span class="f-slider"></span>
+            </label>
+            <span class="f-status-badge">تفعيل الميزة</span>
+        </div>
+        
+        <button class="f-save-btn" onclick="saveDiscountSettings()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+    </div>
+</div>
+        <div class="f-erp-card-item">
+    <label class="f-main-label"><i class="fas fa-file-invoice"></i> 3. أسفل الفاتورة</label>
+    <div class="f-field">
+        <small>نص يظهر أسفل الفاتورة (invoice_footer)</small>
+        <textarea id="invoice_footer" rows="3" placeholder="اكتب النص هنا..."></textarea>
+    </div>
+    <div class="card-action-save">
+        <span class="f-status-badge">مربوط بجدول: settings</span>
+        <button class="f-save-btn" onclick="saveInvoiceFooter()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+    </div>
+</div>
+        <div class="f-erp-card-item">
+            <label class="f-main-label"><i class="fas fa-exclamation-triangle"></i> 4. حد أمان المخزون</label>
+            <div class="f-field">
+                <small>التنبيه عند وصول الكمية لـ (stock_alert_limit)</small>
+                <input type="number" id="stock_alert_limit" placeholder="5">
+            </div>
+            
+            <div class="card-action-save">
+                
+                <label class="f-switch">
+                    
+                    <input type="checkbox" onchange="saveSwitchSetting('stock_alert_status')" id="stock_alert_status">
+                    <span class="f-slider"></span>
+                    
+                </label>
+                <button class="f-save-btn" onclick="saveStockAlertSettings()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+            </div>
+            
+        </div>
+        
+
+
+
+
+        <div class="f-erp-card-item " >
+            <label class="f-main-label"><i class="fas fa-calculator"></i> 5. ضريبة VAT</label>
+            <div class="f-field">
+                <small>نسبة الضريبة (tax_percent)</small>
+                <input type="number" id="tax_percent" placeholder="14">
+            </div>
+            <div class="card-action-save">
+            
+                <label class="f-switch">
+                    <input type="checkbox" id="tax_status"onchange="saveSwitchSetting('tax_status')">
+                    <span class="f-slider"></span>
+                </label>
+                <button class="f-save-btn" onclick="saveTaxSettings()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+            </div>
+            
+        </div>
+
+        <div class="f-erp-card-item">
+    <label class="f-main-label"><i class="fas fa-money-bill-wave"></i> 6. العملة</label>
+    
+    <div class="f-field">
+        <small>اختر العملة أو أضف جديداً (currency_symbol)</small>
+        <div style="display: flex; gap: 8px;">
+            <select id="currency_symbol" style="flex: 1;">
+                <option value="ج.م">الجنيه المصري (ج.م)</option>
+                <option value="$">الدولار الأمريكي ($)</option>
+                <option value="ر.س">الريال السعودي (ر.س)</option>
+                <option value="د.إ">الدرهم الإماراتي (د.إ)</option>
+            </select>
+            <button type="button" onclick="addNewCurrency()" class="f-add-btn" title="إضافة عملة جديدة">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="card-action-save">
+        <span class="f-status-badge">settings</span>
+        <button class="f-save-btn" onclick="saveSwitchSetting('currency_symbol')">
+            <i class="fas fa-save"></i> حفظ العملة
+        </button>
+    </div>
+</div>
+
+
+
+        <div class="f-erp-card-item" id="credit_limit_card">
+    <label class="f-main-label"><i class="fas fa-user-shield"></i> 7. سقف المديونية</label>
+    <div class="f-field">
+        <small>حد الائتمان الافتراضي (credit_limit_default)</small>
+        <input type="number" id="credit_limit_default" placeholder="1000">
+    </div>
+    <div class="card-action-save">
+        <label class="f-switch">
+            <input type="checkbox" id="credit_limit_status" onchange="saveSwitchSetting('credit_limit_status'); updateCreditUI();">
+            <span class="f-slider"></span>
+        </label>
+        <button class="f-save-btn" onclick="saveCreditLimitValue()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+    </div>
+</div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-calendar-times"></i> 8. مراقبة الصلاحية</label>
+            <div class="f-field">
+                <small>التنبيه قبل الانتهاء بـ (يوم)</small>
+                <input type="number" id="expiry_alert_days" placeholder="30">
+            </div>
+            <div class="card-action-save">
+                <span class="f-status-badge">إشعار ذكي</span>
+                <label class="f-switch">
+                    <input type="checkbox" onchange="saveSwitchSetting('expiry_alert_days')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-handshake"></i> 9. عمولات المناديب</label>
+            <div class="f-field">
+                <small>نسبة العمولة الافتراضية (%)</small>
+                <input type="number" id="commission_percent" placeholder="5">
+            </div>
+            <div class="card-action-save">
+                <span class="f-status-badge">Sales History</span>
+                <label class="f-switch">
+                    <input type="checkbox" onchange="saveSwitchSetting('commission_percent')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item" id="return_policy_card">
+    <label class="f-main-label"><i class="fas fa-undo"></i> 10. مهلة المرتجعات</label>
+    <div class="f-field">
+        <small>أقصى مدة للمرتجع - يوم (return_policy_days)</small>
+        <input type="number" id="return_policy_days" placeholder="14">
+    </div>
+    <div class="card-action-save">
+        <label class="f-switch">
+            <input type="checkbox" id="return_policy_status" onchange="saveSwitchSetting('return_policy_status'); ">
+            <span class="f-slider"></span>
+        </label>
+        <button class="f-save-btn" onclick="saveReturnPolicyValue()">
+            <i class="fas fa-save"></i> حفظ البيانات
+        </button>
+    </div>
+</div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-bolt"></i> 11. وضع الكاشير السريع</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تحويل المبيعات لـ "عميل نقدي" آلياً.</small>
+            <div class="card-action-save">
+                <span>تفعيل الميزة</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="auto_clear_cart" onchange="saveSwitchSetting('auto_clear_cart')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-balance-scale"></i> 12. تعدد وحدات القياس</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تفعيل (قطعة/كرتونة/طقم) بالأصناف.</small>
+            <div class="card-action-save">
+                <span>تفعيل النظام</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="multi_unit_status" onchange="saveSwitchSetting('multi_unit_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="    f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-magic"></i> 13. تقريب الفواتير</label>
+            <small style="color: #64748b; font-size: 0.8rem;">جبر القروش لتسهيل الدفع الكاش.</small>
+            <div class="card-action-save">
+                <span>تفعيل التقريب</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="round_total_status" onchange="saveSwitchSetting('round_total_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-user-clock"></i> 14. نظام الورديات</label>
+            <small style="color: #64748b; font-size: 0.8rem;">إلزام فتح وردية قبل البدء بالبيع.</small>
+            <div class="card-action-save">
+                <span>إلزامي</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="shift_system_status" onchange="saveSwitchSetting('shift_system_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item " id="multi_price_card">
+    <label class="f-main-label"><i class="fas fa-layer-group"></i> 15. تعدد فئات الأسعار</label>
+    <div class="f-field">
+        <small style="color: #64748b; font-size: 0.8rem;">تفعيل أسعار الجملة، نصف الجملة، والقطاعي في شاشة البيع.</small>
+    </div>
+    <div class="card-action-save">
+        <span class="f-status-badge">تفعيل الفئات</span>
+        <label class="f-switch">
+            <input type="checkbox" id="multi_price_status" onchange="saveSwitchSetting('multi_price_status'); ">
+            <span class="f-slider"></span>
+        </label>
+    </div>
+</div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-shield-alt"></i> 16. حماية الحد الأدنى</label>
+            <small style="color: #64748b; font-size: 0.8rem;">منع البيع بأقل من سعر التكلفة.</small>
+            <div class="card-action-save">
+                <span>تفعيل الحماية</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="min_price_protection" onchange="saveSwitchSetting('min_price_protection')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-user-secret"></i> 17. سجل المراقبة</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تتبع كافة عمليات الحذف والتعديل.</small>
+            <div class="card-action-save">
+                <span>مراقبة كاملة</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="activity_log_status" checked onchange="saveSwitchSetting('activity_log_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-gift"></i> 18. محرك العروض</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تفعيل عروض Buy X Get Y الزمنية.</small>
+            <div class="card-action-save">
+                <span>تفعيل العروض</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="promo_system_status" onchange="saveSwitchSetting('promo_system_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-shield-virus"></i> 19. إدارة الضمان</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تتبع فترات الضمان في الفواتير.</small>
+            <div class="card-action-save">
+                <span>تفعيل الضمان</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="warranty_system_status" onchange="saveSwitchSetting('warranty_system_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-sync-alt"></i> 20. التحديث الآلي</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تحديث البيع عند تغير الشراء.</small>
+            <div class="card-action-save">
+                <span>تحديث ذكي</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="auto_pricing_update" onchange="saveSwitchSetting('auto_pricing_update')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-eye"></i> 21. مراقب أسعار الموردين</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تنبيه عند تغير سعر الشراء من المورد.</small>
+            <div class="card-action-save">
+                <span>تفعيل التنبيه</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="auto_check_purchase_price" onchange="saveSwitchSetting('auto_check_purchase_price')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="f-erp-card-item f-feature-disabled">
+            <label class="f-main-label"><i class="fas fa-box-open"></i> 22. نظام حجز البضاعة</label>
+            <small style="color: #64748b; font-size: 0.8rem;">تفعيل نظام العربون وحجز المخزون.</small>
+            <div class="card-action-save">
+                <span>تفعيل الحجز</span>
+                <label class="f-switch">
+                    <input type="checkbox" id="reservation_system_status" onchange="saveSwitchSetting('reservation_system_status')">
+                    <span class="f-slider"></span>
+                </label>
+            </div>
+        </div>
+        
+
     </div>
 </section>
 
@@ -566,7 +1138,7 @@ onclick="showSection('inventory')" -->
 </div>
 
 
-   </main>
+    </main>
 
     <div id="productModal" class="modal">
         <div class="modal-content">
@@ -642,93 +1214,147 @@ onclick="showSection('inventory')" -->
 </div>
 
 <div id="reset-modal" class="modal">
-    <div class="modal-content" style="max-width: 450px; border-radius: 20px; border: none; overflow: hidden;">
-        <div class="modal-header" style="background: linear-gradient(45deg, #c0392b, #e74c3c); color: white; padding: 20px; text-align: center;">
-            <h2 style="margin:0; font-size: 1.4rem;"><i class="fas fa-radiation"></i> مركز التحكم في البيانات</h2>
+    <div class="modal-content reset-clean-design">
+        <div class="modal-header-simple">
+            <h2>إدارة تهيئة البيانات</h2>
+            <p>اختر الجداول المراد تصفير محتواها نهائياً</p>
         </div>
-        <div class="modal-body" style="padding: 25px; background: #f9f9f9;">
-            <div class="reset-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
-                <label class="reset-card"><input type="checkbox" class="reset-chk" value="warehouses"> المخازن</label>
-                <label class="reset-card"><input type="checkbox" class="reset-chk" value="categories"> الأقسام</label>
-                <label class="reset-card"><input type="checkbox" class="reset-chk" value="products"> المنتجات</label>
-                <label class="reset-card"><input type="checkbox" class="reset-chk" value="customers"> العملاء</label>
-                <label class="reset-card"><input type="checkbox" class="reset-chk" value="suppliers"> الموردين</label>
-                <label class="reset-card"><input type="checkbox" class="reset-chk" value="purchase_history"> سجل المشتريات</label>
-<label class="reset-card">
-    <input type="checkbox" class="reset-chk" value="sales_history" id="chk-sales" onclick="syncResetFields('sales')"> سجل المبيعات
-</label>
 
-<label class="reset-card">
-    <input type="checkbox" class="reset-chk" value="profit_logs" id="chk-profit" onclick="syncResetFields('profit')"> الأرباح
-</label>
+        <div class="modal-body-clean">
+            <div class="reset-section">
+                <div class="section-title">بيانات التأسيس</div>
+                <div class="reset-options-grid">
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="products">
+                        <div class="option-txt"><span>الأصناف والمخزون</span></div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="customers">
+                        <div class="option-txt"><span>سجل العملاء</span></div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="suppliers">
+                        <div class="option-txt"><span>سجل الموردين</span></div>
+                    </label>
+                </div>
             </div>
 
-            <div style="border-top: 2px dashed #ddd; margin: 15px 0; padding-top: 15px;">
-                <label style="color: #c0392b; font-weight: bold; cursor: pointer;">
-                    <input type="checkbox" id="full-reset-chk" onchange="toggleFullReset(this)"> <i class="fas fa-bomb"></i> إعادة تهيئة كاملة للنظام
+            <div class="reset-section">
+                <div class="section-title">العمليات والسجلات</div>
+                <div class="reset-options-grid">
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="sales_history">
+                        <div class="option-txt"><span>سجل المبيعات</span></div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="purchase_history">
+                        <div class="option-txt"><span>سجل المشتريات</span></div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="expenses">
+                        <div class="option-txt"><span>سجل المصروفات</span></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="reset-section">
+                <div class="section-title">الماليات والنظام</div>
+                <div class="reset-options-grid">
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="customer_payments">
+                        <div class="option-txt"><span>حسابات المديونية</span></div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="settings">
+                        <div class="option-txt"><span>إعدادات النظام</span></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="full-reset-wrapper">
+                <label class="full-reset-label">
+                    <input type="checkbox" id="full-reset-chk" onchange="toggleFullReset(this)">
+                    <span>مسح شامل لكافة بيانات النظام (ضبط مصنع)</span>
                 </label>
             </div>
 
-            <div style="margin-top: 15px;">
-                <input type="password" id="reset-pass-input" placeholder="كلمة سر الإدارة للتأكيد" 
-                       style="width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; outline: none; transition: 0.3s;">
+            <div class="auth-wrapper">
+                <input type="password" id="reset-pass-input" placeholder="كلمة مرور الإدارة الفائقة">
             </div>
         </div>
-        <div class="modal-footer" style="padding: 20px; background: #fff; display: flex; gap: 10px;">
-            <button class="action-btn delete" style="flex: 2; height: 45px; font-weight: bold;" onclick="executeSystemReset()">تأكيد العملية</button>
-            <button class="action-btn" style="flex: 1; background: #95a5a6;" onclick="closeModal('reset-modal')">تراجع</button>
+
+        <div class="modal-footer-clean">
+            <button class="btn-reset-confirm" onclick="executeSystemReset()">تأكيد العملية</button>
+            <button class="btn-reset-cancel" onclick="closeModal('reset-modal')">إلغاء</button>
         </div>
     </div>
 </div>
-<div id="user-management-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><i class="fas fa-users-cog"></i> إدارة مستخدمي النظام</h3>
-            <button class="close-btn" onclick="toggleUserModal(false)">&times;</button>
-        </div>
+<div id="user-management-modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div class="modal-content" style="background:#fff; width:90%; max-width:850px; border-radius:12px; overflow:hidden; box-shadow:0 15px 50px rgba(0,0,0,0.3); direction: rtl;">
         
-        <div class="modal-body">
-            <div class="user-entry-form">
+        <div class="modal-header" style="background:#2c3e50; color:#fff; padding:15px 20px; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; font-size:1.2rem;"><i class="fas fa-users-cog"></i> إدارة نظام المستخدمين</h3>
+            <button onclick="toggleUserModal(false)" style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="modal-body" style="padding:20px; background:#fdfdfd;">
+            <div class="user-entry-form" style="background:#f8fafc; padding:15px; border-radius:8px; border:1px solid #e2e8f0; margin-bottom:20px;">
                 <input type="hidden" id="edit-user-id">
-                <div class="input-row">
-                    <input type="text" id="manage-user-name" placeholder="اسم المستخدم">
-                    <input type="password" id="manage-user-pass" placeholder="كلمة المرور">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="manage-user-name" placeholder="اسم المستخدم" class="form-control" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="password" id="manage-user-pass" placeholder="كلمة المرور" class="form-control" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <select id="manage-user-role" class="form-control" style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                        <option value="cashier">موظف</option>
+                        <option value="admin">مدير</option>
+                    </select>
                 </div>
                 
-                <div class="modal-btns-grid">
-                    <div id="edit-actions" style="display:none; gap:10px;">
-    <button class="btn-success" onclick="updateUser()">حفظ التعديل</button>
-    <button class="btn-secondary" onclick="resetUserForm()">إلغاء</button>
-</div>
-
-                    <button id="btn-add-user" class="btn-modal btn-add-new" onclick="addUser()">
-                        <i class="fas fa-plus"></i> إضافة مستخدم
-                    </button>
-                    
-                    <button id="btn-update-user" class="btn-modal btn-save-edit" style="display:none;" onclick="updateUser()">
-                        <i class="fas fa-save"></i> حفظ التعديل
-                    </button>
-                    <button id="btn-cancel-edit" class="btn-modal btn-cancel-modal" style="display:none;" onclick="resetUserForm()">
-                        إلغاء
-                    </button>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <div style="position: relative; flex:1;">
+                        <button type="button" onclick="togglePermPopup(event)" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px; background:#fff; cursor:pointer; text-align:right;">
+                            <i class="fas fa-shield-alt"></i> تحديد الصلاحيات (<span id="selected-count">0</span>)
+                        </button>
+                        <div id="perm-popup" style="display:none; position:absolute; top:45px; right:0; width:100%; background:#fff; border:1px solid #ccc; box-shadow:0 5px 15px rgba(0,0,0,0.1); z-index:100; padding:10px; border-radius:5px;">
+                            <div id="sections-perm-list" style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+                                <label style="font-size:12px; color: #e53e3e; font-weight: bold; grid-column: span 2; border-bottom: 1px inset #eee; padding-bottom: 5px; margin-bottom: 5px;">
+        <input type="checkbox" id="full-access-check" value="all" onchange="toggleAllPerms(this)"> 
+        <i class="fas fa-unlock-alt"></i> وصول كامل (أدمن)
+    </label>
+                                <label style="font-size:12px;"><input type="checkbox" value="welcome-section" onchange="updatePermCount()"> الرئيسية</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="sales" onchange="updatePermCount()"> فاتورة المبيعات</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="purchase" onchange="updatePermCount()"> فاتورة لامشتريات</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="inventory" onchange="updatePermCount()"> المخزن</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="customers" onchange="updatePermCount()"> سجل العملاء</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="reports" onchange="updatePermCount()"> سجل الفواتير</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="dashboard-section" onchange="updatePermCount()"> لوحة التحكم</label>
+                                <label style="font-size:12px;"><input type="checkbox" value="settings-section" onchange="updatePermCount()"> الإعدادات</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="btn-add-user" onclick="addUser()" style="background:#2c3e50; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">إضافة</button>
+                    <div id="edit-actions" style="display:none; gap:5px;">
+                        <button class="btn-success" onclick="updateUser()" style="background:#27ae60; color:#fff; border:none; padding:10px; border-radius:4px; cursor:pointer;">حفظ</button>
+                        <button class="btn-secondary" onclick="resetUserForm()" style="background:#95a5a6; color:#fff; border:none; padding:10px; border-radius:4px; cursor:pointer;">إلغاء</button>
+                    </div>
                 </div>
             </div>
 
-            <div class="user-table-container">
-                <table class="user-table">
-                    <thead>
+            <div class="user-table-container" style="max-height:300px; overflow-y:auto; border:1px solid #eee; border-radius:8px;">
+                <table style="width:100%; border-collapse:collapse; text-align:right; font-size:14px;">
+                    <thead style="background:#f1f5f9; position:sticky; top:0;">
                         <tr>
-                            <th>التحكم</th>
-                            <th>المستخدم</th>
+                            <th style="padding:12px; border-bottom:2px solid #e2e8f0; width:25%;">المستخدم</th>
+                            <th style="padding:12px; border-bottom:2px solid #e2e8f0; width:55%;">الصلاحيات</th>
+                            <th style="padding:12px; border-bottom:2px solid #e2e8f0; width:20%; text-align:center;">التحكم</th>
                         </tr>
                     </thead>
-                    <tbody id="users-list-table">
-                        </tbody>
+                    <tbody id="users-list-table"></tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
 <div id="pass-management-modal" class="modal-overlay" style="display:none;">
     <div class="modal-content">
         <div class="modal-header">
@@ -788,13 +1414,53 @@ onclick="showSection('inventory')" -->
         </div>
     </div>
 </div>
-
+<div id="calculator-panel" class="calc-wrapper">
+    <div class="calculator-content mini-calc">
+        <div class="calculator-header" id="calculator-panel-header">
+            <span><i class="fas fa-calculator"></i> حاسبة</span>
+            <div class="calc-controls">
+                <button onclick="toggleMinimizeCalc()"><i class="fas fa-minus"></i></button>
+                <button onclick="closeCalculator()"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        
+        <div id="calc-main-body">
+            <div class="calculator-body">
+                <input type="text" id="calc-display" readonly placeholder="0">
+                <div class="calc-buttons">
+                    <button onclick="clearCalc()" class="btn-alt">C</button>
+                    <button onclick="deleteLast()" class="btn-alt">⌫</button>
+                    <button onclick="appendCalc('/')" class="btn-op">÷</button>
+                    <button onclick="appendCalc('*')" class="btn-op">×</button>
+                    
+                    <button onclick="appendCalc('7')">7</button>
+                    <button onclick="appendCalc('8')">8</button>
+                    <button onclick="appendCalc('9')">9</button>
+                    <button onclick="appendCalc('-')" class="btn-op">-</button>
+                    
+                    <button onclick="appendCalc('4')">4</button>
+                    <button onclick="appendCalc('5')">5</button>
+                    <button onclick="appendCalc('6')">6</button>
+                    <button onclick="appendCalc('+')" class="btn-op">+</button>
+                    
+                    <button onclick="appendCalc('1')">1</button>
+                    <button onclick="appendCalc('2')">2</button>
+                    <button onclick="appendCalc('3')">3</button>
+                    <button onclick="calculateResult()" class="btn-equal">=</button>
+                    
+                    <button onclick="appendCalc('0')" class="btn-zero">0</button>
+                    <button onclick="appendCalc('.')">.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
     <!-- <script src="js/script.js"></script> -->
     <!-- <script src="js/script2.js"></script> -->
     <!-- <script src="js/script3.js"></script> -->
     <script src="js/script4.js"></script>
-    <script src="js/setting.js"></script>
+    <!-- <script src="js/setting.js"></script> -->
 
 </body>
 </html>

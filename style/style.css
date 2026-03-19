@@ -79,23 +79,26 @@ td { padding: 15px; text-align: center; border-bottom: 1px solid #edf2f7; color:
 }
 .btn-delete { color: #e53e3e; background: none; border: none; cursor: pointer; }
 .filter-buttons {
-    display: flex;
-    gap: 10px;
-    background: #f1f5f9;
-    padding: 5px;
-    border-radius: 10px;
+display: flex;       /* تفعيل نظام الفليكس لرص العناصر جنب بعض */
+    flex-wrap: nowrap;   /* منع الزراير إنها تنزل سطر جديد */
+    gap: 8px;            /* مسافة بسيطة بين كل زرار والتاني */
+    overflow-x: auto;    /* لو الشاشة صغرت قوي، يظهر شريط تمرير بدل ما يخرجوا بره */
+    padding: 10px 0;
+    align-items: center;
 }
 
 .btn-filter {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
+    white-space: nowrap; /* منع النص اللي جوه الزرار إنه يتقسم على سطرين */
+    padding: 8px 15px;
+    flex-shrink: 0;      /* منع الزرار إنه "يتعصر" أو يصغر عن حجمه الطبيعي */
+    border-radius: 5px;
     cursor: pointer;
-    font-weight: 600;
-    color: #64748b;
-    background: transparent;
-    transition: 0.3s;
+    /* باقي تنسيقاتك للألوان */
+
+    flex: 1; 
+    text-align: center;
 }
+
 
 .btn-filter:hover {
     color: var(--accent-blue);
@@ -160,21 +163,46 @@ td { padding: 15px; text-align: center; border-bottom: 1px solid #edf2f7; color:
 /* أزرار الفلترة (الكل/وارد/صادر) */
 .filter-buttons {
     display: flex;
-    background: #f1f5f9;
-    padding: 4px;
-    border-radius: 12px;
+    flex-wrap: nowrap;   /* يمنع النزول لسطر جديد نهائياً */
+    gap: 8px;
+    overflow-x: auto;    /* يسمح بالتمرير لليمين واليسار لو الشاشة ضيقة جداً */
+    padding: 10px;
+    align-items: center;
+    background: #f8fafc; /* اختياري: لون خلفية خفيف للحاوية */
+    border-radius: 10px;
+    width: 100%;         /* تأكد إنها واخدة العرض كامل */
+    box-sizing: border-box;
 }
 
 .btn-filter {
     border: none;
-    padding: 4px 20px;
+    padding: 6px 16px;   /* تضبيط المسافات الداخلية */
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 600;
     color: #64748b;
-    background: transparent;
+    background: #ffffff;  /* لون خلفية للزراير عشان تبان */
     transition: all 0.2s ease;
+    white-space: nowrap;  /* أهم سطر: يمنع النص إنه يتقسم على سطرين جوه الزرار */
+    flex: 1;              /* يخلي الزراير تتوزع بالتساوي وتملأ الفراغ */
+    min-width: fit-content; /* يضمن إن الزرار ميكشش لدرجة إن الكلام يختفي */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* ضل خفيف يخلي شكلهم بروفيشنال */
+}
+
+/* حالة الزرار النشط (لما تدوس عليه) */
+.btn-filter.active {
+    background: #2563eb; /* لون أزرق احترافي */
+    color: white;
+}
+
+/* إخفاء شريط التمرير (Scrollbar) عشان الشكل يبقى أنضف */
+.filter-buttons::-webkit-scrollbar {
+    display: none;
+}
+.filter-buttons {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
 }
 
 .btn-filter.active {
@@ -1058,8 +1086,8 @@ body {
     background-color: #f8f9fa;
 }
 /* حاوية الجدول - بتخليه ديسك توب بجد */
-.table-container {
-    max-height: 400px; /* طول ثابت للسلة */
+.table-container { 
+    max-height:700px; /* طول ثابت للسلة */
     overflow-y: auto;  /* تفعيل السكرول الداخلي */
     border: 1px solid #eef2f7;
     border-radius: 8px;

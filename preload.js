@@ -18,3 +18,8 @@ contextBridge.exposeInMainWorld('dbAPI', {
     addCategory: (name) => db.prepare("INSERT OR IGNORE INTO categories (name) VALUES (?)").run(name),
     deleteCategory: (id) => db.prepare("DELETE FROM categories WHERE id=?").run(id)
 });
+const { contextBridge, ipcRenderer } = require('electron');
+
+contextBridge.exposeInMainWorld('electronAPI', {
+    getPrinters: () => ipcRenderer.invoke('get-printers')
+});

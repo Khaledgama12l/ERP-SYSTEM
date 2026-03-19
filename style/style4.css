@@ -347,3 +347,164 @@ tr:hover { background: #334155; }
 }
 
 
+/* تنسيق الحاوية الأساسية للفلتر */
+.filter-area {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* تنسيق الصف اللي شايل التاريخ والزراير */
+.row-filters {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+}
+
+/* صندوق البحث */
+.search-box-history {
+    width: 100% !important; /* خليه يملأ المساحة المتاحة فوق */
+    max-width: 100%;
+}
+
+/* حاوية الأزرار - ده أهم جزء */
+.filter-buttons {
+    display: flex;
+    flex: 1;               /* يخليه ياخد كل المساحة المتبقية بجانب التاريخ */
+    background: rgba(255, 255, 255, 0.5); /* شكل زجاجي */
+    padding: 5px;
+    border-radius: 12px;
+    gap: 5px;
+    flex-wrap: nowrap;     /* يمنع النزول لسطر جديد */
+    overflow-x: auto;      /* يسمح بالسحب لو المكان ضاق */
+}
+
+/* تنسيق الزرار نفسه */
+.btn-filter {
+    flex: 1;               /* يخلي الزراير تتوزع بالتساوي */
+    white-space: nowrap;   /* يمنع الكلام يتقسم سطرين */
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-width: fit-content; /* يضمن إن الزرار ميكشش عن حجم الكلمة */
+}
+
+/* التاريخ */
+.date-filter {
+    flex-shrink: 0;        /* يمنع التاريخ إنه يصغر لصالح الزراير */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+/* إخفاء السكرول بار عشان الشكل */
+.filter-buttons::-webkit-scrollbar {
+    display: none;
+}
+.reset-clean-design {
+    max-width: 650px !important;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.modal-header-simple {
+    padding: 25px 30px;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: right;
+}
+
+.modal-header-simple h2 { margin: 0; font-size: 1.4rem; color: #2c3e50; }
+.modal-header-simple p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.9rem; }
+
+.reset-section { margin-bottom: 25px; }
+.section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #95a5a6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    border-right: 3px solid #34495e;
+    padding-right: 10px;
+}
+
+.reset-options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #f9f9f9;
+    border: 1px solid #edeef0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.option-item:hover { background: #f0f2f5; border-color: #d1d5db; }
+.option-item input { margin-left: 10px; }
+.option-txt span { font-size: 0.9rem; color: #34495e; }
+
+.full-reset-wrapper {
+    background: #fffafa;
+    border: 1px solid #ffebeb;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+.full-reset-label { color: #c0392b; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+
+.auth-wrapper { margin-top: 20px; }
+#reset-pass-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.modal-footer-clean {
+    padding: 20px 30px;
+    display: flex;
+    gap: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.btn-reset-confirm {
+    flex: 2;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-reset-cancel {
+    flex: 1;
+    background: #ecf0f1;
+    color: #7f8c8d;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
