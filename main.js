@@ -79,7 +79,7 @@ ipcMain.handle('load-db-from-disk', async () => {
 ipcMain.handle('check-for-update', async () => {
     return new Promise((resolve) => {
         // نصيحة: استبدل هذا الرابط برابط ملف JSON على GitHub الخاص بك
-        const request = net.request('https://raw.githubusercontent.com/username/repo/main/version.json');
+        const request = net.request('https://raw.githubusercontent.com/Khaledgama12l/ERP-SYSTEM/main/version.json');
         
         request.on('response', (response) => {
             let data = '';
