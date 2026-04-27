@@ -2982,3 +2982,53 @@ input:checked + .f-slider:before { transform: translateX(20px); }
     justify-content: center;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+    .invoice-table th { background: #f4f7f6; color: #fff; padding: 12px; font-size: 13px; }
+    .invoice-table td { padding: 10px; border-bottom: 1px solid #eee; vertical-align: middle; }
+    .btn-action-view { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    .btn-action-view:hover { background: #2980b9; }
+    .row-highlight:hover { background-color: #f1f7ff !important; cursor: pointer; }
+    /* ضيف ده في ملف الـ CSS عندك أو جوه <style> */
+.input-item {
+    position: relative; /* مهم جداً لضبط مكان الاقتراحات */
+}
+
+#customer-suggestions {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid #eee;
+    margin-top: 5px;
+}
+.total-display {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.total-item {
+    text-align: center;
+}
+
+.total-item span {
+    font-size: 14px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.total-item h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #2c3e50;
+}
+
+.total-item.paid h2 {
+    color: #2ecc71; /* لون أخضر للمدفوع */
+}
+
+.total-item.remaining h2 {
+    color: #e74c3c; /* لون أحمر للمتبقي */
+}

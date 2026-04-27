@@ -1,8 +1,15 @@
 const { app, BrowserWindow, ipcMain, net, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const axios = require('axios');
+const { exec } = require('child_process');
 
-// 1. منع فتح أكثر من نسخة (Single Instance Lock)
+// متغيرات عالمية
+let win;
+let downloadStream = null;
+const dbPath = path.join(app.getPath('userData'), 'system_data.db');
+
+// 1. منع فتح أكثر من نسخة
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
     app.quit();
@@ -15,7 +22,7 @@ if (!gotTheLock) {
     });
 }
 
-// 2. تفعيل Hot Reload (للتطوير فقط)
+// 2. تفعيل Hot Reload (للتطوير)
 try {
     require('electron-reloader')(module, {
         debug: true,
@@ -23,9 +30,6 @@ try {
         ignore: [/system_data\.db/, /data/] 
     });
 } catch (err) {}
-
-let win;
-const dbPath = path.join(app.getPath('userData'), 'system_data.db');
 
 function createWindow() {
     win = new BrowserWindow({
@@ -37,7 +41,6 @@ function createWindow() {
             contextIsolation: false, 
         }
     });
-
     win.loadFile('index.html');
 }
 
@@ -75,12 +78,10 @@ ipcMain.handle('load-db-from-disk', async () => {
     return null;
 });
 
-// --- [C] نظام التحديثات (أبو بلاش) ---
+// --- [C] نظام التحديثات وفحص الإصدار ---
 ipcMain.handle('check-for-update', async () => {
     return new Promise((resolve) => {
-        // نصيحة: استبدل هذا الرابط برابط ملف JSON على GitHub الخاص بك
-        const request = net.request('https://raw.githubusercontent.com/Khaledgama12l/ERP-SYSTEM/main/version.json');
-        
+        const request = net.request('https://raw.githubusercontent.com/Khaledgama12l/ERP-SYSTEM/refs/heads/main/version.json');        
         request.on('response', (response) => {
             let data = '';
             response.on('data', (chunk) => { data += chunk; });
@@ -88,7 +89,6 @@ ipcMain.handle('check-for-update', async () => {
                 try {
                     const serverConfig = JSON.parse(data);
                     const currentVersion = app.getVersion();
-                    
                     resolve({
                         isUpdateAvailable: serverConfig.version !== currentVersion,
                         newVersion: serverConfig.version,
@@ -97,13 +97,75 @@ ipcMain.handle('check-for-update', async () => {
                 } catch (e) { resolve({ isUpdateAvailable: false }); }
             });
         });
-        
         request.on('error', () => resolve({ isUpdateAvailable: false }));
         request.end();
     });
 });
 
-// --- [D] دورة حياة التطبيق ---
+// --- [D] تحميل وتثبيت التحديث (مع دعم الإلغاء) ---
+ipcMain.handle('download-and-install', async (event, url) => {
+    const controller = new AbortController();
+    const tempPath = path.join(app.getPath('temp'), 'erp-setup.exe');
+    
+    // مستمع لمرة واحدة لإشارة الإلغاء
+    ipcMain.once('cancel-download-action', () => {
+        controller.abort();
+        if (downloadStream) downloadStream.destroy();
+        if (fs.existsSync(tempPath)) {
+            try { fs.unlinkSync(tempPath); } catch(e){}
+        }
+    });
+
+    try {
+        const response = await axios({
+            url,
+            method: 'GET',
+            responseType: 'stream',
+            signal: controller.signal
+        });
+
+        downloadStream = response.data;
+        const totalLength = response.headers['content-length'];
+        let downloadedLength = 0;
+
+        response.data.on('data', (chunk) => {
+            downloadedLength += chunk.length;
+            const progress = Math.round((downloadedLength / totalLength) * 100);
+            if (win) win.webContents.send('download-progress', progress);
+        });
+
+        const writer = fs.createWriteStream(tempPath);
+        response.data.pipe(writer);
+
+        return new Promise((resolve, reject) => {
+            writer.on('finish', () => {
+                exec(`"${tempPath}"`);
+                setTimeout(() => app.quit(), 1000);
+                resolve({ success: true });
+            });
+            writer.on('error', reject);
+            controller.signal.addEventListener('abort', () => {
+                writer.close();
+                reject(new Error("تم إلغاء التحميل بواسطة المستخدم"));
+            });
+        });
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
+// --- [E] مديونية العملاء (الآجل) ---
+ipcMain.handle('get-last-credit-invoice', async (event, customerName) => {
+    // ملاحظة: هنا يجب استدعاء دالة البحث من مكتبة sqlite3 التي تستخدمها
+    // مثال (تأكد من تعريف db الخاص بك):
+    // return new Promise((resolve) => {
+    //    db.get(sql, [customerName], (err, row) => resolve(row));
+    // });
+    console.log("جاري البحث عن مديونية العميل:", customerName);
+    return null; // سيتم استبداله بنتيجة البحث الحقيقية
+});
+
+// --- [F] دورة حياة التطبيق ---
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
