@@ -4,18 +4,34 @@
     
     <meta charset="UTF-8">
     <title>نظام إدارة المبيعات </title>
+    <link rel="stylesheet" href="libs/all.min.css">
     <link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="style/style2.css">
     <link rel="stylesheet" href="style/style3.css">
     <!-- <link rel="stylesheet" href="style/style4.css"> -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="libs/sweetalert2@11.js"></script>
     <link rel="manifest" href="manifest.json">
     
     <link rel="icon" type="image/x-icon" href="icon.ico">
 </head>
 <body>
-    <div id="main-login-overlay">
+    <div id="activation-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,10,20,0.99); z-index:9999999; align-items:center; justify-content:center; direction:rtl;">
+    <div style="background:white; padding:40px; border-radius:15px; width:400px; text-align:center; border: 5px solid #3b82f6;">
+        <h2 style="color:#1e293b;">تفعيل النظام (Senior Mode)</h2>
+        <p id="debug-status" style="color:red; font-weight:bold; font-size:12px;">Diagnostic: Waiting for Action...</p>
+        
+        <div style="background:#f1f5f9; padding:10px; margin:20px 0; border-radius:8px;">
+            <span style="font-size:12px; color:#64748b;">كود الجهاز:</span>
+            <div style="font-family:monospace; font-size:20px; font-weight:bold;" id="display-hwid">----</div>
+        </div>
+
+        <input type="text" id="activation-input" placeholder="أدخل كود التفعيل" style="width:100%; padding:15px; margin-bottom:20px; border:2px solid #cbd5e1; border-radius:8px; text-align:center; font-size:18px;">
+        
+        <button type="button" id="force-activate-btn" onclick="processActivation()" style="width:100%; padding:15px; background:#2563eb; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">تفعيل الآن</button>
+        
+    </div>
+</div>
+    <!-- <div id="main-login-overlay">
     <div class="login-side-form">
         <div class="login-header">
             <h2>مرحباً بك</h2>
@@ -37,10 +53,10 @@
         </button>
     </div>
     <div class="login-side-image"></div>
-</div>
+</div> -->
 
 
-<aside class="sidebar">
+<aside class="sidebar" id="resizable-sidebar">
     <nav>
         <div id="nav-welcome" class="nav-item active" onclick="showSection('welcome-section')">
             <i class="fas fa-home"></i> <span>الرئيسية</span>
@@ -82,6 +98,7 @@
             <i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span>
         </div>
     </nav>
+    <div class="resize-handle" id="sidebar-handle"></div>
 </aside>
 <!-- onclick="showSection('dashboard-section')" 
 onclick="showSection('inventory')" -->
@@ -109,11 +126,11 @@ onclick="showSection('inventory')" -->
                 </div>
             </div>
 
-            <div class="quick-access-wrapper f-feature-disabled ">
-                <button id="quick-btn-1" class="btn-quick" title="وصول سريع 1">
-                    <i class="fas fa-rocket"></i> اختصار 1
-                </button>
-                <button id="quick-btn-2" class="btn-quick" title="وصول سريع 2">
+            <div class="quick-access-wrapper ">
+                <button id="quick-btn-1" class="btn-quick" title="فتح بيان أسعار جديد" onclick="openQuickQuote()">
+    <i class="fas fa-file-invoice-dollar"></i> بيان أسعار
+</button>
+                <button id="quick-btn-2" class="btn-quick f-feature-disabled " title="وصول سريع 2">
                     <i class="fas fa-th-large"></i> اختصار 2
                 </button>
             </div>
@@ -173,16 +190,69 @@ onclick="showSection('inventory')" -->
 <div id="modal-product" class="modal-overlay">
     <div class="modal-content glass-morphism">
         <h2><i class="fas fa-plus-circle"></i> إضافة منتج جديد</h2>
+
+        <div class="ai-smart-panel">
+            <button class="smart-btn ai-add" onclick="document.getElementById('ai-bulk-add').click()">
+                <i class="fas fa-robot"></i> سحب أصناف 
+            </button>
+            <button class="smart-btn ai-update" onclick="document.getElementById('ai-bulk-update').click()">
+                <i class="fas fa-sync-alt"></i> تحديث الأسعار
+            </button>
+            <input type="file" id="ai-bulk-add" hidden onchange="processBulkInvoice(this, 'ADD')">
+            <input type="file" id="ai-bulk-update" hidden onchange="processBulkInvoice(this, 'UPDATE')">
+            
+            <div id="ai-progress-container" style="display: none; width: 100%; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                    <span id="ai-status-text" style="font-size: 12px; color: #0984e3; font-weight: bold;">جاري التحليل...</span>
+                    <span id="ai-percentage" style="font-size: 12px; color: #0984e3;">0%</span>
+                </div>
+                <div style="width: 100%; background: #dfe6e9; border-radius: 10px; height: 8px; overflow: hidden;">
+                    <div id="ai-progress-bar" style="width: 0%; background: #0984e3; height: 100%; transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="grid-form">
             <input type="text" id="p-name" placeholder="اسم المنتج">
             <select id="p-warehouse-select">
-    <option>جاري التحميل...</option>
-</select> <select id="p-category-select"></select>  <input type="number" id="p-qty" placeholder="الكمية">
+                <option>جاري التحميل...</option>
+            </select> 
+            <select id="p-category-select"></select>
+            <input type="number" id="p-qty" placeholder="الكمية">
             <input type="number" id="p-buy" placeholder="سعر الشراء">
             <input type="number" id="p-sell" placeholder="سعر البيع">
+
+            <div id="multi-unit-section" style="display: none; grid-column: 1 / -1; background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; border: 1px dashed rgba(255, 255, 255, 0.2); box-sizing: border-box; margin-top: 5px;">
+                <h4 style="margin: 0 0 12px 0; font-size: 0.9rem; font-weight: bold; color: inherit; text-align: right;"><i class="fas fa-balance-scale"></i> تفاصيل وحدات القياس</h4>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px;">
+                    <div>
+                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px; text-align: right;">الوحدة الكبرى</label>
+                        <input type="text" id="p_main_unit" value="كرتونة" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px; text-align: right;">الوحدة الصغرى</label>
+                        <input type="text" id="p_sub_unit" placeholder="قطعة" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size: 11px; opacity: 0.8; display: block; margin-bottom: 4px; text-align: right;">المعامل</label>
+                        <input type="number" id="p_conversion_factor" value="12" min="1" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 8px;">
+                    <input type="number" id="p_buy_price_main" placeholder="شراء الوحدة الكبرى" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                    <input type="number" id="p_sell_price_main" placeholder="بيع الوحدة الكبرى" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <input type="number" id="p_buy_price_sub" placeholder="شراء الوحدة الصغرى" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                    <input type="number" id="p_sell_price_sub" placeholder="بيع الوحدة الصغرى" style="width: 100%; padding: 8px; border-radius: 6px; text-align: center; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit;">
+                </div>
+            </div>
         </div>
+
         <div class="modal-footer">
-            <button class="btn btn-green" onclick="saveProduct()">حفظ</button>
+            <button class="btn btn-green" id="btn-submit-product" onclick="saveProduct()">حفظ</button>
             <button class="btn btn-red" onclick="closeAllModals()">إلغاء</button>
         </div>
     </div>
@@ -238,6 +308,7 @@ onclick="showSection('inventory')" -->
             
         </div>
     </div>
+    
 
     <div class="invoice-container">
         <div id="sale-tabs-container" style="display: flex; gap: 5px; margin-bottom: 10px;">
@@ -285,12 +356,23 @@ onclick="showSection('inventory')" -->
             <option value="card">فيزا (Visa)</option>
             <option value="credit">آجل (Credit)</option> </select>
     </div>
+    <button class="smart-btn ai-add" onclick="document.getElementById('ai-sales-upload').click()">
+    <i class="fas fa-file-import"></i> سحب فاتورة 
+</button>
+<input type="file" id="ai-sales-upload" hidden onchange="processBulkInvoiceToSales(this)">
     <div class="return-mode-toggle" style="margin-right: auto; display: flex; align-items: center; gap: 10px;">
     <span id="return-label" style="font-weight: bold; color: #666;">وضع البيع</span>
     <label class="f-switch">
         <input type="checkbox" id="return-mode-switch" onchange="toggleReturnMode()">
         <span class="f-slider reverse"></span>
     </label>
+    <div class="quote-mode-toggle" style="display: flex; align-items: center; gap: 10px; margin-right: 15px;">
+    <span style="font-weight: bold; color: #2980b9;">بيان أسعار</span>
+    <label class="f-switch">
+        <input type="checkbox" id="quote-mode-switch" onchange="toggleQuoteMode()">
+        <span class="f-slider" ></span>
+    </label>
+</div>
 </div>
 </div>
 
@@ -533,10 +615,42 @@ onclick="showSection('inventory')" -->
             <h1><i class="fas fa-users-cog"></i> سجل مديونيات العملاء</h1>
         </div>
         <div class="header-actions">
+            
             <input type="text" id="customer-search-filter" placeholder="بحث باسم العميل أو الهاتف..." oninput="filterCustomerTable()" style="padding: 8px; border-radius: 20px; border: 1px solid #ddd; width: 250px;">
         </div>
     </div>
+<button onclick="openAddCustomerModal()" class="btn-approve" style="background: #3498db; margin-left: 10px;">
+    <i class="fas fa-user-plus"></i> إضافة  
+</button>
 
+<div id="addCustomerModal" class="modal" style="display: none; align-items: center; justify-content: center; z-index: 10000;">
+    <div class="modal-content" style="max-width: 400px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fas fa-user-plus" style="font-size: 40px; color: #3498db;"></i>
+            <h4 style="margin-top: 10px;">إضافة   </h4>
+        </div> 
+        
+        <div class="f-field" style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom: 5px; font-weight: bold;">اسم العميل:</label>
+            <input type="text" id="new-cust-name" placeholder="اسم العميل الثلاثي" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+
+        <div class="f-field" style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom: 5px;">رقم الهاتف:</label>
+            <input type="text" id="new-cust-phone" placeholder="01xxx" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px;">
+        </div>
+
+        <div class="f-field" style="margin-bottom: 15px;">
+            <label style="display:block; margin-bottom: 5px; font-weight: bold; color: #c0392b;">المديونية  :</label>
+            <input type="number" id="new-cust-balance" value="0" style="width: 100%; padding: 10px; border: 2px solid #e74c3c; border-radius: 8px; font-size: 18px; text-align: center;">
+        </div>
+
+        <div class="modal-footer" style="display: flex; gap: 10px;">
+            <button onclick="saveNewCustomer()" class="btn-modal btn-modal-primary" style="flex: 2; background: #3498db;">حفظ العميل</button>
+            <button onclick="closeModal('addCustomerModal')" class="btn-modal btn-modal-secondary" style="flex: 1;">إلغاء</button>
+        </div>
+    </div>
+</div>
     <div id="debt-screen" class="screen-content">
         <div class="table-container shadow-sm">
             <table>
@@ -818,8 +932,8 @@ onclick="showSection('inventory')" -->
             <button class="btn-main-action secondary" onclick="togglePassModal(true)">
                 <i class="fas fa-key"></i> الأرقام السرية للأقسام
             </button>
-            <button class="btn-danger-glow f-feature-disabled" onclick="openResetModal()" style="min-width: 150px;">
-        <i class="fas fa-trash-alt" style="font-size: 1.2rem;"></i>
+            <button class="btn-danger-glow " onclick="openResetModal()" style="min-width: 150px;">
+        
         <span>إعادة تهيئة النظام</span>
     </button>
         </div>
@@ -1114,13 +1228,13 @@ onclick="showSection('inventory')" -->
             </div>
         </div>
 
-        <div class="f-erp-card-item f-feature-disabled">
+        <div class="f-erp-card-item ">
             <label class="f-main-label"><i class="fas fa-balance-scale"></i> 12. تعدد وحدات القياس</label>
             <small style="color: #64748b; font-size: 0.8rem;">تفعيل (قطعة/كرتونة/طقم) بالأصناف.</small>
             <div class="card-action-save">
                 <span>تفعيل النظام</span>
                 <label class="f-switch">
-                    <input type="checkbox" id="multi_unit_status" onchange="saveSwitchSetting('multi_unit_status')">
+                    <input type="checkbox" id="multi_unit_status" onchange="saveSingleSetting('multi_unit_status')">
                     <span class="f-slider"></span>
                 </label>
             </div>
@@ -1260,26 +1374,9 @@ onclick="showSection('inventory')" -->
     </div>
 </div>
 
-
     </main>
 
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal('productModal')">&times;</span>
-            <h2 id="modal-title">إضافة منتج</h2>
-            <input type="hidden" id="edit-id">
-            <div class="input-group">
-                <input type="text" id="m-name" placeholder="اسم المنتج">
-                <select id="m-category" class="fancy-select"></select>
-                <div class="row">
-                    <input type="number" id="m-buy" placeholder="سعر الشراء">
-                    <input type="number" id="m-sell" placeholder="سعر البيع">
-                </div>
-                <input type="number" id="m-qty" placeholder="الكمية">
-                <button class="btn btn-blue" onclick="saveProduct()">حفظ المنتج</button>
-            </div>
-        </div>
-    </div>
+
 
     <div id="catModal" class="modal">
         <div class="modal-content">
@@ -1311,7 +1408,7 @@ onclick="showSection('inventory')" -->
         </div>
     </div>
 </div>
-<div class="status-bar">
+<div class="status-bar" style="background-color: #1a202c;">
     <div id="live-clock"></div>
     <div id="user">المستخدم: مدير النظام</div>
     <div class="status-online">متصل (قاعدة بيانات محلية)</div>
@@ -1388,8 +1485,12 @@ onclick="showSection('inventory')" -->
                         <div class="option-txt"><span>حسابات المديونية</span></div>
                     </label>
                     <label class="option-item">
-                        <input type="checkbox" class="reset-chk" value="settings">
-                        <div class="option-txt"><span>إعدادات النظام</span></div>
+                        <input type="checkbox" class="reset-chk" value="system_shifts">
+                        <div class="option-txt"><span>سجل الشفتات</span></div>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" class="reset-chk" value="activity_logs">
+                        <div class="option-txt"><span>سجل الحركات (Logs)</span></div>
                     </label>
                 </div>
             </div>
@@ -1402,7 +1503,7 @@ onclick="showSection('inventory')" -->
             </div>
 
             <div class="auth-wrapper">
-                <input type="password" id="reset-pass-input" placeholder="كلمة مرور الإدارة الفائقة">
+                <input type="password" id="reset-pass-input" placeholder="كلمة مرور الإدارة ">
             </div>
         </div>
 
@@ -1578,12 +1679,41 @@ onclick="showSection('inventory')" -->
         </div>
     </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.js"></script>
-    <!-- <script src="js/script.js"></script> -->
-    <!-- <script src="js/script2.js"></script> -->
-    <!-- <script src="js/script3.js"></script> -->
+<div id="ai-chat-launcher" onclick="toggleAIChat()" style="cursor: pointer;">
+    <span>AI</span>
+</div>
+
+<div id="ai-chat-modal">
+    <div class="chat-header">
+        <span><i class="fas fa-robot"></i> AI Assistant</span>
+        <button class="chat-btn" style="color:white; background:none; border:none;" onclick="toggleAIChat()">✕</button>
+    </div>
+    
+    <div id="chat-messages"></div>
+
+    <div id="image-preview-bar" style="display:none; padding:10px; background:#f0f2f5; align-items:center; gap:10px">
+        <img id="preview-img" src="" style="height:40px; border-radius:5px">
+        <small>صورة جاهزة للتحليل</small>
+        <button onclick="clearImage()" style="border:none; background:none; cursor:pointer">✕</button>
+    </div>
+
+    <div class="chat-input-area">
+        <button class="chat-btn" onclick="document.getElementById('ai-image-input').click()">
+            <i class="fas fa-image"></i>
+        </button>
+        
+        <input type="file" id="ai-image-input" style="display:none" accept="image/*" onchange="previewChatImage(this)">
+        
+        <input type="text" id="ai-user-text" placeholder="كيف أساعدك يا سينيور؟" 
+               onkeypress="if(event.key === 'Enter') sendChatMessage()">
+               
+        <button class="chat-btn send-btn" onclick="sendChatMessage()">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
+    <script src="libs/sql-wasm.js"></script>
     <script src="js/script4.js"></script>
-    <!-- <script src="js/setting.js"></script> -->
 
 </body>
 </html>

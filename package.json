@@ -1,12 +1,13 @@
 {
   "name": "erp-system",
-  "version": "1.0.4",
+  "version": "1.1.4",
   "description": "ERP System Project",
   "author": "Khaled",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "build-clean": "taskkill /F /IM erp-system.exe /T & electron-builder"
   },
   "devDependencies": {
     "electron": "^34.0.1",
@@ -14,23 +15,48 @@
     "electron-reload": "^2.0.0-alpha.1",
     "electron-reloader": "^1.2.3"
   },
+  "dependencies": {
+    "axios": "^1.13.6",
+    "node-machine-id": "^1.1.12"
+  },
   "build": {
     "appId": "com.khaled.erp",
+    "productName": "ERP System",
+    "copyright": "Copyright © 2026 Khaled",
     "directories": {
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
+      "target": [
+        "nsis"
+      ],
+      "icon": "icon.ico",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "ERP System",
+      "runAfterFinish": true,
+      "installerHeaderIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico"
     },
     "files": [
       "**/*",
       "!dist/*",
-      "!node_modules/*"
+      "!node_modules/electron",
+      "!node_modules/electron-builder",
+      "!node_modules/electron-reload",
+      "!node_modules/electron-reloader",
+      "!.vscode",
+      "!*.log",
+      "!.git"
     ],
-    "asar": true
-  },
-  "dependencies": {
-    "axios": "^1.13.6"
+    "asar": true,
+    "asarUnpack": [
+      "**/*.node"
+    ]
   }
 }

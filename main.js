@@ -3,13 +3,14 @@ const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
 const { exec } = require('child_process');
+const { machineIdSync } = require('node-machine-id');
 
-// متغيرات عالمية
+// 1. المتغيرات العالمية والإعدادات الأساسية
 let win;
 let downloadStream = null;
 const dbPath = path.join(app.getPath('userData'), 'system_data.db');
 
-// 1. منع فتح أكثر من نسخة
+// 2. منع فتح أكثر من نسخة من البرنامج
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
     app.quit();
@@ -22,7 +23,7 @@ if (!gotTheLock) {
     });
 }
 
-// 2. تفعيل Hot Reload (للتطوير)
+// 3. تفعيل Hot Reload للتطوير (اختياري - يفضل تعطيله عند الإنتاج)
 try {
     require('electron-reloader')(module, {
         debug: true,
@@ -31,6 +32,7 @@ try {
     });
 } catch (err) {}
 
+// 4. دالة إنشاء نافذة البرنامج
 function createWindow() {
     win = new BrowserWindow({
         width: 1200,
@@ -38,13 +40,34 @@ function createWindow() {
         icon: path.join(__dirname, 'icon.ico'),
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false, 
+            contextIsolation: false,
+            devTools: true // سيبها true عشان الشفرة السرية تشتغل
         }
     });
+
+    // 1. حذف القائمة العلوية (عشان نلغي اختصاراتها)
+    win.setMenu(null); 
+
     win.loadFile('index.html');
+
+    // 2. القفل الصارم للاختصارات من داخل الـ WebContents
+    win.webContents.on('before-input-event', (event, input) => {
+        // منع F12
+        if (input.key === 'F12') {
+            event.preventDefault();
+        }
+        // منع Ctrl + Shift + I (أو Cmd + Option + I على الماك)
+        if (input.control && input.shift && input.key.toLowerCase() === 'i') {
+            event.preventDefault();
+        }
+        // منع Ctrl + Shift + J
+        if (input.control && input.shift && input.key.toLowerCase() === 'j') {
+            event.preventDefault();
+        }
+    });
 }
 
-// --- [A] إدارة الطابعات والطباعة ---
+// --- [A] خدمات الطباعة ---
 ipcMain.handle('get-printers', async () => {
     return await win.webContents.getPrintersAsync();
 });
@@ -63,7 +86,7 @@ ipcMain.handle('execute-print', async (event, options) => {
     });
 });
 
-// --- [B] إدارة قاعدة البيانات ---
+// --- [B] إدارة قاعدة البيانات على الهارد ---
 ipcMain.handle('save-db-to-disk', async (event, buffer) => {
     try {
         fs.writeFileSync(dbPath, Buffer.from(buffer));
@@ -74,11 +97,24 @@ ipcMain.handle('save-db-to-disk', async (event, buffer) => {
 });
 
 ipcMain.handle('load-db-from-disk', async () => {
-    if (fs.existsSync(dbPath)) return fs.readFileSync(dbPath);
+    if (fs.existsSync(dbPath)) {
+        return fs.readFileSync(dbPath);
+    }
     return null;
 });
-
-// --- [C] نظام التحديثات وفحص الإصدار ---
+// مسح ملف قاعدة البيانات نهائياً من الهارد
+ipcMain.handle('delete-db-file', async () => {
+    try {
+        if (fs.existsSync(dbPath)) {
+            fs.unlinkSync(dbPath); // حذف الملف
+            return { success: true };
+        }
+        return { success: true, message: "File already gone" };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+// --- [C] نظام فحص التحديثات أونلاين ---
 ipcMain.handle('check-for-update', async () => {
     return new Promise((resolve) => {
         const request = net.request('https://raw.githubusercontent.com/Khaledgama12l/ERP-SYSTEM/refs/heads/main/version.json');        
@@ -102,12 +138,11 @@ ipcMain.handle('check-for-update', async () => {
     });
 });
 
-// --- [D] تحميل وتثبيت التحديث (مع دعم الإلغاء) ---
+// --- [D] تحميل وتثبيت التحديث التلقائي ---
 ipcMain.handle('download-and-install', async (event, url) => {
     const controller = new AbortController();
     const tempPath = path.join(app.getPath('temp'), 'erp-setup.exe');
     
-    // مستمع لمرة واحدة لإشارة الإلغاء
     ipcMain.once('cancel-download-action', () => {
         controller.abort();
         if (downloadStream) downloadStream.destroy();
@@ -144,30 +179,24 @@ ipcMain.handle('download-and-install', async (event, url) => {
                 resolve({ success: true });
             });
             writer.on('error', reject);
-            controller.signal.addEventListener('abort', () => {
-                writer.close();
-                reject(new Error("تم إلغاء التحميل بواسطة المستخدم"));
-            });
         });
     } catch (error) {
         return { success: false, error: error.message };
     }
 });
 
-// --- [E] مديونية العملاء (الآجل) ---
-ipcMain.handle('get-last-credit-invoice', async (event, customerName) => {
-    // ملاحظة: هنا يجب استدعاء دالة البحث من مكتبة sqlite3 التي تستخدمها
-    // مثال (تأكد من تعريف db الخاص بك):
-    // return new Promise((resolve) => {
-    //    db.get(sql, [customerName], (err, row) => resolve(row));
-    // });
-    console.log("جاري البحث عن مديونية العميل:", customerName);
-    return null; // سيتم استبداله بنتيجة البحث الحقيقية
+// --- [E] فتح DevTools بالشفرة السرية من المتصفح ---
+ipcMain.on('open-dev-tools-now', (event) => {
+    if (win) win.webContents.openDevTools();
 });
 
-// --- [F] دورة حياة التطبيق ---
+// --- [F] تشغيل البرنامج وإغلاقه ---
 app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });

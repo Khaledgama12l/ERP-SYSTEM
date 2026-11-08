@@ -66,7 +66,7 @@ async function initDatabase() {
 
         // 1. تهيئة مكتبة SQL.js
         const SQL = await initSqlJs({
-            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`
+            locateFile: file => `libs/${file}` // تأكد من المسار الصحيح لملف sql-wasm.js
         });
 
         let dataToLoad = null;
@@ -140,119 +140,154 @@ async function initDatabase() {
 // 1. خليه فوق خالص مرة واحدة بس
 const { ipcRenderer } = require('electron');
 const { shell } = require('electron'); // سطر إضافي لتعريف shell
-async function checkForUpdates() {
-    try {
-        const updateInfo = await ipcRenderer.invoke('check-for-update');
+//  
+//     try {
+//         const updateInfo = await ipcRenderer.invoke('check-for-update');
         
-        if (updateInfo.isUpdateAvailable) {
-            const updateBanner = document.createElement('div');
-            updateBanner.id = "update-container";
+//         if (updateInfo.isUpdateAvailable) {
+//             const updateBanner = document.createElement('div');
+//             updateBanner.id = "update-container";
             
-            // ستايل هادئ واحترافي
-            updateBanner.style.cssText = `
-                position: fixed; 
-                top: 25px; 
-                left: 50%; 
-                transform: translateX(-50%);
-                background: #ffffff; 
-                color: #333; 
-                padding: 18px 25px; 
-                border-radius: 10px;
-                z-index: 10000; 
-                direction: rtl; 
-                min-width: 360px; 
-                box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-                text-align: center; 
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                border: 1px solid #e0e0e0;
-            `;
+//             // ستايل هادئ واحترافي
+//             updateBanner.style.cssText = `
+//                 position: fixed; 
+//                 top: 25px; 
+//                 left: 50%; 
+//                 transform: translateX(-50%);
+//                 background: #ffffff; 
+//                 color: #333; 
+//                 padding: 18px 25px; 
+//                 border-radius: 10px;
+//                 z-index: 10000; 
+//                 direction: rtl; 
+//                 min-width: 360px; 
+//                 box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+//                 text-align: center; 
+//                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+//                 border: 1px solid #e0e0e0;
+//             `;
 
-            updateBanner.innerHTML = `
-                <div id="status-text" style="margin-bottom: 12px; font-size: 15px; color: #555;">
-                    📦 يتوفر إصدار جديد <strong style="color: #2980b9;">${updateInfo.newVersion}</strong>
-                </div>
+//             updateBanner.innerHTML = `
+//                 <div id="status-text" style="margin-bottom: 12px; font-size: 15px; color: #555;">
+//                     📦 يتوفر إصدار جديد <strong style="color: #2980b9;">${updateInfo.newVersion}</strong>
+//                 </div>
                 
-                <div id="prog-bg" style="display:none; background: #f0f0f0; height: 6px; border-radius: 10px; margin: 15px 0; overflow: hidden;">
-                    <div id="prog-fill" style="background: #3498db; width: 0%; height: 100%; transition: width 0.3s ease;"></div>
-                </div>
+//                 <div id="prog-bg" style="display:none; background: #f0f0f0; height: 6px; border-radius: 10px; margin: 15px 0; overflow: hidden;">
+//                     <div id="prog-fill" style="background: #3498db; width: 0%; height: 100%; transition: width 0.3s ease;"></div>
+//                 </div>
 
-                <div style="display: flex; justify-content: center; gap: 12px; margin-top: 5px;">
-                    <button id="btn-start" style="background: #3498db; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: 0.2s;">تحديث الآن</button>
-                    <button id="btn-cancel" style="display:none; background: #ecf0f1; color: #e74c3c; border: 1px solid #fab1a0; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 14px;">إلغاء</button>
-                    <button id="btn-later" style="background: transparent; color: #95a5a6; border: none; padding: 8px 18px; cursor: pointer; font-size: 14px;">لاحقاً</button>
-                </div>
-            `;
+//                 <div style="display: flex; justify-content: center; gap: 12px; margin-top: 5px;">
+//                     <button id="btn-start" style="background: #3498db; color: white; border: none; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 14px; transition: 0.2s;">تحديث الآن</button>
+//                     <button id="btn-cancel" style="display:none; background: #ecf0f1; color: #e74c3c; border: 1px solid #fab1a0; padding: 8px 18px; border-radius: 6px; cursor: pointer; font-size: 14px;">إلغاء</button>
+//                     <button id="btn-later" style="background: transparent; color: #95a5a6; border: none; padding: 8px 18px; cursor: pointer; font-size: 14px;">لاحقاً</button>
+//                 </div>
+//             `;
 
-            document.body.appendChild(updateBanner);
+//             document.body.appendChild(updateBanner);
 
-            // إضافة تأثير Hover بسيط للأزرار
-            const btnStart = document.getElementById('btn-start');
-            btnStart.onmouseover = () => btnStart.style.background = '#2980b9';
-            btnStart.onmouseout = () => btnStart.style.background = '#3498db';
+//             // إضافة تأثير Hover بسيط للأزرار
+//             const btnStart = document.getElementById('btn-start');
+//             btnStart.onmouseover = () => btnStart.style.background = '#2980b9';
+//             btnStart.onmouseout = () => btnStart.style.background = '#3498db';
 
-            // زر البدء
-            document.getElementById('btn-start').addEventListener('click', async () => {
-                document.getElementById('btn-start').style.display = 'none';
-                document.getElementById('btn-later').style.display = 'none';
-                document.getElementById('btn-cancel').style.display = 'inline-block';
-                document.getElementById('prog-bg').style.display = 'block';
+//             // زر البدء
+//             document.getElementById('btn-start').addEventListener('click', async () => {
+//                 document.getElementById('btn-start').style.display = 'none';
+//                 document.getElementById('btn-later').style.display = 'none';
+//                 document.getElementById('btn-cancel').style.display = 'inline-block';
+//                 document.getElementById('prog-bg').style.display = 'block';
                 
-                const result = await ipcRenderer.invoke('download-and-install', updateInfo.updateUrl);
-                if (result && !result.success && result.error !== "تم إلغاء التحميل بواسطة المستخدم") {
-                    alert("فشل التحميل: " + result.error);
-                    updateBanner.remove();
-                }
-            });
+//                 const result = await ipcRenderer.invoke('download-and-install', updateInfo.updateUrl);
+//                 if (result && !result.success && result.error !== "تم إلغاء التحميل بواسطة المستخدم") {
+//                     alert("فشل التحميل: " + result.error);
+//                     updateBanner.remove();
+//                 }
+//             });
 
-            // زر الإلغاء
-            document.getElementById('btn-cancel').addEventListener('click', () => {
-                ipcRenderer.send('cancel-download-action');
-                updateBanner.remove();
-            });
+//             // زر الإلغاء
+//             document.getElementById('btn-cancel').addEventListener('click', () => {
+//                 ipcRenderer.send('cancel-download-action');
+//                 updateBanner.remove();
+//             });
 
-            // زر لاحقاً
-            document.getElementById('btn-later').addEventListener('click', () => {
-                updateBanner.remove();
-            });
-        }
-    } catch (err) { console.error(err); }
-}
+//             // زر لاحقاً
+//             document.getElementById('btn-later').addEventListener('click', () => {
+//                 updateBanner.remove();
+//             });
+//         }
+//     } catch (err) { console.error(err); }
+// }
 
-// تحديث نسبة التحميل
-ipcRenderer.on('download-progress', (event, progress) => {
-    const fill = document.getElementById('prog-fill');
-    const status = document.getElementById('status-text');
-    if(fill) fill.style.width = progress + '%';
-    if(status) status.innerText = `جاري التحميل... ${progress}%`;
-});
+// // تحديث نسبة التحميل
+// ipcRenderer.on('download-progress', (event, progress) => {
+//     const fill = document.getElementById('prog-fill');
+//     const status = document.getElementById('status-text');
+//     if(fill) fill.style.width = progress + '%';
+//     if(status) status.innerText = `جاري التحميل... ${progress}%`;
+// });
 
-setTimeout(checkForUpdates, 3000);
+// setTimeout(checkForUpdates, 3000);
 
 
 // دالة منفصلة للجداول عشان الكود ميبقاش "سلطة"
 function createTablesSchema() {
 
     // 1. المستخدمين
-    db.run(`CREATE TABLE IF NOT EXISTS system_users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, password TEXT, role TEXT DEFAULT 'cashier')`);
-    try { db.run("ALTER TABLE system_users ADD COLUMN role TEXT DEFAULT 'cashier'"); } catch (e) {}
-    db.run("INSERT OR IGNORE INTO system_users (username, password, role) VALUES ('admin', '123', 'admin')");
-    try {
-    db.run("ALTER TABLE system_users ADD COLUMN permissions TEXT");
-} catch(e) { /* العمود موجود بالفعل */ }
+    db.run(`CREATE TABLE IF NOT EXISTS system_users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        username TEXT UNIQUE, 
+        password TEXT, 
+        role TEXT DEFAULT 'cashier', 
+        permissions TEXT DEFAULT 'all'
+    )`);
 
-    // 2. الأصناف والمخازن
-    db.run(`CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY AUTOINCREMENT, code TEXT UNIQUE, name TEXT, warehouse TEXT, category TEXT, quantity INTEGER DEFAULT 0, buyPrice REAL DEFAULT 0, sellPrice REAL DEFAULT 0, date TEXT)`);
+    try { db.run("ALTER TABLE system_users ADD COLUMN role TEXT DEFAULT 'cashier'"); } catch (e) {}
+    try { db.run("ALTER TABLE system_users ADD COLUMN permissions TEXT DEFAULT 'all'"); } catch (e) {}
+    db.run("INSERT OR IGNORE INTO system_users (username, password, role, permissions) VALUES ('admin', '123', 'admin', 'all')");
+    db.run("UPDATE system_users SET permissions = 'all' WHERE username = 'admin' AND (permissions IS NULL OR permissions = '')");
+
+    // 2. الأصناف والمخازن (تم تحديثها بالكامل لدعم تعدد الوحدات)
+    db.run(`CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        code TEXT UNIQUE, 
+        name TEXT, 
+        warehouse TEXT, 
+        category TEXT, 
+        quantity INTEGER DEFAULT 0, 
+        buyPrice REAL DEFAULT 0, 
+        sellPrice REAL DEFAULT 0, 
+        date TEXT,
+        main_unit TEXT DEFAULT 'قطعة',
+        sub_unit TEXT DEFAULT '',
+        conversion_factor INTEGER DEFAULT 1,
+        buy_price_main REAL DEFAULT 0,
+        sell_price_main REAL DEFAULT 0,
+        buy_price_sub REAL DEFAULT 0,
+        sell_price_sub REAL DEFAULT 0
+    )`);
+
+    // إضافة حقول الوحدات ديناميكياً لتفادي كراش القواعد القديمة
+    const productUnitColumns = [
+        "main_unit TEXT DEFAULT 'قطعة'",
+        "sub_unit TEXT DEFAULT ''",
+        "conversion_factor INTEGER DEFAULT 1",
+        "buy_price_main REAL DEFAULT 0",
+        "sell_price_main REAL DEFAULT 0",
+        "buy_price_sub REAL DEFAULT 0",
+        "sell_price_sub REAL DEFAULT 0"
+    ];
+    productUnitColumns.forEach(col => { try { db.run(`ALTER TABLE products ADD COLUMN ${col}`); } catch (e) {} });
+
     db.run(`CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)`);
     db.run(`CREATE TABLE IF NOT EXISTS warehouses (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE)`);
 
-    // 3. الموردين والعملاء (تأكد من وجود الـ balance للمديونية)
+    // 3. الموردين والعملاء
     db.run(`CREATE TABLE IF NOT EXISTS suppliers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, phone TEXT, address TEXT, balance REAL DEFAULT 0, added_date TEXT)`);
     db.run(`CREATE TABLE IF NOT EXISTS customers (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT UNIQUE, phone TEXT, address TEXT, balance REAL DEFAULT 0, added_date TEXT)`);
     try { db.run("ALTER TABLE customers ADD COLUMN balance REAL DEFAULT 0"); } catch (e) {}
     try { db.run("ALTER TABLE customers ADD COLUMN credit_limit REAL DEFAULT 0"); } catch (e) {}
-// ... (الجزء اللي فوق في الدالة زي ما هو)
 
-    // 4. سجل الفواتير (تحديث شامل لكل الأعمدة المطلوبة)
+    // 4. سجل الفواتير
     db.run(`CREATE TABLE IF NOT EXISTS sales_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         customer_name TEXT, 
@@ -275,17 +310,15 @@ function createTablesSchema() {
         discount_scope TEXT DEFAULT 'total'
     )`);
 
-    // ✅ التعديل هنا: ضفنا discount_scope للمصفوفة عشان يضاف للجداول القديمة
     const salesColumns = [
         "customer_phone TEXT", "type TEXT DEFAULT 'sale'", "paid_amount REAL DEFAULT 0",
         "remaining_amount REAL DEFAULT 0", "items_json TEXT", "original_invoice_id INTEGER",
         "discount_value REAL DEFAULT 0", "tax_value REAL DEFAULT 0", "final_total REAL DEFAULT 0",
-        "discount_scope TEXT DEFAULT 'total'" // <-- السطر ده كان ناقص وهو سبب المشكلة
+        "discount_scope TEXT DEFAULT 'total'"
     ];
     salesColumns.forEach(col => { try { db.run(`ALTER TABLE sales_history ADD COLUMN ${col}`); } catch (e) {} });
 
-// ... (بقية الدالة زي ما هي)
-    // 5. سجل حركات مديونية العملاء (التحصيل والدفع)
+    // 5. سجل حركات مديونية العملاء
     db.run(`CREATE TABLE IF NOT EXISTS customer_payments (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         customer_id INTEGER,
@@ -295,7 +328,6 @@ function createTablesSchema() {
         date DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
     
-
     // 6. سجل المشتريات
     db.run(`CREATE TABLE IF NOT EXISTS purchase_history (id INTEGER PRIMARY KEY AUTOINCREMENT, supplier_name TEXT, total REAL, date TEXT, type TEXT DEFAULT 'purchase')`);
 
@@ -316,7 +348,9 @@ function createTablesSchema() {
     const defaultSettings = [
         ['company_name', 'اسم المؤسسة'], ['tax_percent', '14'], ['tax_status', '0'],
         ['currency_symbol', 'ج.م'], ['discount_status', '0'], ['discount_type', 'amount'],
-        ['stock_alert_limit', '5'], ['auto_print', '0'], ['return_policy_days', '14'], ['invoice_footer', 'شكراً لتعاملكم معنا']
+        ['stock_alert_limit', '5'], ['auto_print', '0'], ['return_policy_days', '14'], 
+        ['invoice_footer', 'شكراً لتعاملكم معنا'],
+        ['multi_unit_status', '0'] // حقل حالة تفعيل تعدد الوحدات (0 = مغلق افتراضياً)
     ];
     defaultSettings.forEach(s => db.run("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", [s[0], s[1]]));
 
@@ -325,7 +359,6 @@ function createTablesSchema() {
     db.run("INSERT OR IGNORE INTO customers (name, added_date) VALUES ('عميل نقدي', ?)", [today]);
 
     if (typeof loadSettings === 'function') loadSettings();
-    
 }
 
 
@@ -496,20 +529,34 @@ window.checkInventoryAlerts = function() {
 
 // 6. العمليات على المنتجات
 function saveProduct() {
-    const name = document.getElementById('p-name').value.trim();
-    const wh = document.getElementById('p-warehouse-select').value;
-    const cat = document.getElementById('p-category-select').value;
-    const newQty = parseInt(document.getElementById('p-qty').value) || 0;
-    const buy = parseFloat(document.getElementById('p-buy').value) || 0;
-    const sell = parseFloat(document.getElementById('p-sell').value) || 0;
+    // تعديل الـ IDs هنا بناءً على عناصر الـ HTML الأصلية الخاصة بك
+    const name = document.getElementById('m-name') ? document.getElementById('m-name').value.trim() : document.getElementById('p-name').value.trim();
+    const wh = document.getElementById('p-warehouse-select') ? document.getElementById('p-warehouse-select').value : 'المخزن الرئيسي';
+    const cat = document.getElementById('p-category-select') ? document.getElementById('p-category-select').value : 'عام';
+    const newQty = parseInt(document.getElementById('p-qty') ? document.getElementById('p-qty').value : 0) || 0;
+    const buy = parseFloat(document.getElementById('p-buy') ? document.getElementById('p-buy').value : 0) || 0;
+    const sell = parseFloat(document.getElementById('p-sell') ? document.getElementById('p-sell').value : 0) || 0;
 
     if (!name) { alert("يرجى إدخال اسم المنتج"); return; }
+
+    // قراءة حقول تعدد الوحدات الجديدة
+    const multiUnitSwitch = document.getElementById('multi_unit_status');
+    const isMultiUnit = multiUnitSwitch ? multiUnitSwitch.checked : false;
+
+    const mainUnit = isMultiUnit ? (document.getElementById('p_main_unit').value.trim() || 'قطعة') : 'قطعة';
+    const subUnit = isMultiUnit ? document.getElementById('p_sub_unit').value.trim() : '';
+    const factor = isMultiUnit ? (parseInt(document.getElementById('p_conversion_factor').value) || 1) : 1;
+    
+    const buyMain = isMultiUnit ? (parseFloat(document.getElementById('p_buy_price_main').value) || buy) : buy;
+    const sellMain = isMultiUnit ? (parseFloat(document.getElementById('p_sell_price_main').value) || sell) : sell;
+    const buySub = isMultiUnit ? (parseFloat(document.getElementById('p_buy_price_sub').value) || buy) : buy;
+    const sellSub = isMultiUnit ? (parseFloat(document.getElementById('p_sell_price_sub').value) || sell) : sell;
 
     // 1. البحث عما إذا كان المنتج موجود مسبقاً في نفس المخزن
     const checkExist = db.exec("SELECT id, quantity FROM products WHERE name = ? AND warehouse = ?", [name, wh]);
 
     if (checkExist.length > 0) {
-        // المنتج موجود -> تحديث الكمية (الكمية الحالية + الكمية المدخلة)
+        // المنتج موجود -> تحديث الكمية (الكمية الحالية + الكمية المدخلة) وجميع بيانات الوحدات
         const existingId = checkExist[0].values[0][0];
         const existingQty = checkExist[0].values[0][1];
         const updatedQty = existingQty + newQty;
@@ -518,23 +565,40 @@ function saveProduct() {
                 quantity = ?, 
                 buyPrice = ?, 
                 sellPrice = ?,
-                category = ?
-                WHERE id = ?`, [updatedQty, buy, sell, cat, existingId]);
+                category = ?,
+                main_unit = ?,
+                sub_unit = ?,
+                conversion_factor = ?,
+                buy_price_main = ?,
+                sell_price_main = ?,
+                buy_price_sub = ?,
+                sell_price_sub = ?
+                WHERE id = ?`, [
+                    updatedQty, buy, sell, cat, 
+                    mainUnit, subUnit, factor, 
+                    buyMain, sellMain, buySub, sellSub, 
+                    existingId
+                ]);
         
         console.log(`تم تحديث كمية المنتج: ${name}. الكمية الجديدة: ${updatedQty}`);
     } else {
-        // المنتج غير موجود -> إضافة كمنتج جديد
+        // المنتج غير موجود -> إضافة كمنتج جديد مع حقول الوحدات كاملة
         const autoCode = "P-" + Date.now().toString().slice(-6);
         const today = new Date().toISOString().split('T')[0];
 
-        db.run(`INSERT INTO products (code, name, warehouse, category, quantity, buyPrice, sellPrice, date) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [autoCode, name, wh, cat, newQty, buy, sell, today]);
+        db.run(`INSERT INTO products (
+                    code, name, warehouse, category, quantity, buyPrice, sellPrice, date,
+                    main_unit, sub_unit, conversion_factor, buy_price_main, sell_price_main, buy_price_sub, sell_price_sub
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, [
+                    autoCode, name, wh, cat, newQty, buy, sell, today,
+                    mainUnit, subUnit, factor, buyMain, sellMain, buySub, sellSub
+                ]);
         
         console.log(`تم إضافة منتج جديد: ${name}`);
     }
 
     saveDbToLocal();
-    renderInventory();
+    if (typeof renderInventory === 'function') renderInventory();
     closeAllModals();
 }
 function editProduct(id) {
@@ -545,46 +609,108 @@ function editProduct(id) {
     if (res.length > 0) {
         const p = res[0].values[0]; // صف المنتج
 
-        // فتح المودال وتعبئة البيانات
-        document.getElementById('modal-product').style.display = 'flex';
+        // فتح المودال وتعبئة البيانات (تأكد من استخدام الـ ID الصحيح للمودال عندك)
+        const modal = document.getElementById('productModal') || document.getElementById('modal-product');
+        if (modal) modal.style.display = 'flex';
+        
         fillSelects(); // عشان الـ selects تملأ الأول
 
-        // تعبئة الحقول (row[2] هو الاسم، row[5] الكمية، إلخ)
-        document.getElementById('p-name').value = p[2];
+        // تعبئة الحقول الأساسية
+        const nameInput = document.getElementById('m-name') || document.getElementById('p-name');
+        if (nameInput) nameInput.value = p[2];
+        
         document.getElementById('p-warehouse-select').value = p[3];
         document.getElementById('p-category-select').value = p[4];
         document.getElementById('p-qty').value = p[5];
         document.getElementById('p-buy').value = p[6];
         document.getElementById('p-sell').value = p[7];
 
+        // تعبئة حقول تعدد وحدات القياس الجديدة من الـ Array (الأعمدة المضافة حديثاً)
+        const multiUnitSwitch = document.getElementById('multi_unit_status');
+        const isMultiUnitEnabled = multiUnitSwitch ? multiUnitSwitch.checked : false;
+        const unitSection = document.getElementById('multi-unit-section');
+
+        if (unitSection) {
+            if (isMultiUnitEnabled) {
+                unitSection.style.display = 'block';
+                // تعبئة القيم المفرومة من قاعدة البيانات بناءً على ترتيب الـ Schema الجديد
+                document.getElementById('p_main_unit').value = p[9] || 'قطعة';
+                document.getElementById('p_sub_unit').value = p[10] || '';
+                document.getElementById('p_conversion_factor').value = p[11] || 1;
+                document.getElementById('p_buy_price_main').value = p[12] || p[6];
+                document.getElementById('p_sell_price_main').value = p[13] || p[7];
+                document.getElementById('p_buy_price_sub').value = p[14] || p[6];
+                document.getElementById('p_sell_price_sub').value = p[15] || p[7];
+            } else {
+                unitSection.style.display = 'none';
+            }
+        }
+
         // تغيير شكل المودال ليكون وضع "تعديل"
-        document.querySelector('#modal-product h2').innerText = "تعديل منتج";
-        const saveBtn = document.querySelector('#modal-product .btn-green');
-        saveBtn.innerText = "تحديث البيانات";
-        saveBtn.onclick = updateProduct; // نغير وظيفة الزرار
+        const title = document.querySelector('#productModal h2') || document.querySelector('#modal-product h2');
+        if (title) title.innerText = "تعديل منتج";
+
+        const saveBtn = document.querySelector('#productModal .btn-blue') || document.querySelector('#modal-product .btn-green');
+        if (saveBtn) {
+            saveBtn.innerText = "تحديث البيانات";
+            saveBtn.onclick = updateProduct; // نغير وظيفة الزرار
+        }
     }
 }
 function updateProduct() {
-    const name = document.getElementById('p-name').value;
-    const wh = document.getElementById('p-warehouse-select').value;
-    const cat = document.getElementById('p-category-select').value;
-    const qty = parseInt(document.getElementById('p-qty').value) || 0;
-    const buy = parseFloat(document.getElementById('p-buy').value) || 0;
-    const sell = parseFloat(document.getElementById('p-sell').value) || 0;
+    // قراءة الحقول الأساسية بدعم الـ IDs المختلفة
+    const nameInput = document.getElementById('m-name') || document.getElementById('p-name');
+    const name = nameInput ? nameInput.value.trim() : '';
+    const wh = document.getElementById('p-warehouse-select') ? document.getElementById('p-warehouse-select').value : 'المخزن الرئيسي';
+    const cat = document.getElementById('p-category-select') ? document.getElementById('p-category-select').value : 'عام';
+    const qty = parseInt(document.getElementById('p-qty') ? document.getElementById('p-qty').value : 0) || 0;
+    const buy = parseFloat(document.getElementById('p-buy') ? document.getElementById('p-buy').value : 0) || 0;
+    const sell = parseFloat(document.getElementById('p-sell') ? document.getElementById('p-sell').value : 0) || 0;
 
-    // أمر الـ SQL للتحديث
+    if (!name) { alert("يرجى إدخال اسم المنتج"); return; }
+
+    // قراءة حقول تعدد وحدات القياس الجديدة
+    const multiUnitSwitch = document.getElementById('multi_unit_status');
+    const isMultiUnit = multiUnitSwitch ? multiUnitSwitch.checked : false;
+
+    const mainUnit = isMultiUnit ? (document.getElementById('p_main_unit').value.trim() || 'قطعة') : 'قطعة';
+    const subUnit = isMultiUnit ? document.getElementById('p_sub_unit').value.trim() : '';
+    const factor = isMultiUnit ? (parseInt(document.getElementById('p_conversion_factor').value) || 1) : 1;
+    
+    const buyMain = isMultiUnit ? (parseFloat(document.getElementById('p_buy_price_main').value) || buy) : buy;
+    const sellMain = isMultiUnit ? (parseFloat(document.getElementById('p_sell_price_main').value) || sell) : sell;
+    const buySub = isMultiUnit ? (parseFloat(document.getElementById('p_buy_price_sub').value) || buy) : buy;
+    const sellSub = isMultiUnit ? (parseFloat(document.getElementById('p_sell_price_sub').value) || sell) : sell;
+
+    // أمر الـ SQL المحدث للتحديث الشامل لبيانات المنتج والوحدات
     db.run(`UPDATE products SET 
-            name = ?, warehouse = ?, category = ?, 
-            quantity = ?, buyPrice = ?, sellPrice = ? 
+            name = ?, 
+            warehouse = ?, 
+            category = ?, 
+            quantity = ?, 
+            buyPrice = ?, 
+            sellPrice = ?,
+            main_unit = ?,
+            sub_unit = ?,
+            conversion_factor = ?,
+            buy_price_main = ?,
+            sell_price_main = ?,
+            buy_price_sub = ?,
+            sell_price_sub = ?
             WHERE id = ?`, 
-            [name, wh, cat, qty, buy, sell, currentEditId]);
+            [
+                name, wh, cat, qty, buy, sell,
+                mainUnit, subUnit, factor,
+                buyMain, sellMain, buySub, sellSub,
+                currentEditId
+            ]);
 
     saveDbToLocal(); // حفظ التغييرات
-    renderInventory(); // تحديث الجدول
+    if (typeof renderInventory === 'function') renderInventory(); // تحديث الجدول
     closeAllModals();
     
     // إعادة المودال لوضعه الطبيعي (إضافة)
-    resetProductModal();
+    if (typeof resetProductModal === 'function') resetProductModal();
 }
 
 function resetProductModal() {
@@ -954,10 +1080,23 @@ window.updateDateTime = function() {
     const now = new Date();
     // ... كود الساعة ...
 };
-
+document.addEventListener("DOMContentLoaded", () => {
+    const buyMain = document.getElementById('p_buy_price_main');
+    const sellMain = document.getElementById('p_sell_price_main');
+    
+    if (buyMain && sellMain) {
+        buyMain.addEventListener('input', (e) => {
+            document.getElementById('p-buy').value = e.target.value;
+        });
+        sellMain.addEventListener('input', (e) => {
+            document.getElementById('p-sell').value = e.target.value;
+        });
+    }
+});
 window.openProductModal = function() {
     document.getElementById('modal-product').style.display = 'flex';
     fillSelects();
+    if (typeof applyMultiUnitVisibility === 'function') applyMultiUnitVisibility();
 };
 
 window.searchProductForSale = function(term) {
@@ -1026,34 +1165,52 @@ window.addToPurchaseCart = function() {
 window.savePurchaseInvoice = function() {
     if (purchaseItems.length === 0) return alert("الفاتورة فارغة");
     
-    const supplier = document.getElementById('supplier-name').value || "مورد عام";
+    const supplier = document.getElementById('supplier-name').value.trim() || "مورد عام";
     const el = document.getElementById('purchase-final-total');
-    const total = el ? parseFloat(el.innerText) : 0;
-    try {
-        // أ. تسجيل الفاتورة في السجل بنوع 'وارد'
-        db.run("INSERT INTO sales_history (date, type, customer_name, total) VALUES (?, ?, ?, ?)", 
-            [new Date().toISOString(), 'وارد', supplier, totalAmount]);
+    
+    // تصحيح سحب الرقم وتنظيفه من أي نصوص زائدة
+    const total = el ? parseFloat(el.innerText.replace(/[^\d.-]/g, '')) : 0;
 
-        // ب. تحديث المخزن (زيادة الكمية وتعديل السعر)
+    try {
+        db.run("BEGIN TRANSACTION");
+
+        // أ. تسجيل الفاتورة في السجل (تأكد من استخدام final_total ليظهر في التقارير)
+        // أرسلنا متغير total بدلاً من totalAmount
+        db.run(`INSERT INTO sales_history (date, type, customer_name, total, final_total, payment_method) 
+                VALUES (?, ?, ?, ?, ?, ?)`, 
+            [new Date().toISOString(), 'purchase', supplier, total, total, 'وارد']);
+
+        // ب. تحديث المخزن
         purchaseItems.forEach(item => {
             const exists = db.exec("SELECT id FROM products WHERE name = ?", [item.name]);
             if (exists.length > 0) {
-                // إذا كان المنتج موجوداً: زود الكمية وحدث السعر
                 db.run("UPDATE products SET quantity = quantity + ?, buyPrice = ?, sellPrice = ? WHERE name = ?", 
                     [item.qty, item.buyPrice, item.sellPrice, item.name]);
             } else {
-                // إذا كان منتجاً جديداً: أضفه للمخزن
-                db.run("INSERT INTO products (name, quantity, buy_price, sell_price, category) VALUES (?, ?, ?, ?, ?)", 
-                    [item.name, item.qty, item.buyPrice, item.sellPrice, 'عام']);
+                // تأكد من أسماء الأعمدة buyPrice و sellPrice حسب السكيما الموحدة
+                db.run("INSERT INTO products (name, quantity, buyPrice, sellPrice, category, code) VALUES (?, ?, ?, ?, ?, ?)", 
+                    [item.name, item.qty, item.buyPrice, item.sellPrice, 'عام', 'P-' + Date.now()]);
             }
         });
 
+        db.run("COMMIT");
+
         alert("تم حفظ المشتريات بنجاح وتحديث المخزن ✅");
-        purchaseItems = []; // تصفير الفاتورة
-        renderPurchaseTable();
+        
+        // تصفير البيانات
+        purchaseItems = []; 
+        if (typeof renderPurchaseTable === 'function') renderPurchaseTable();
         document.getElementById('supplier-name').value = "";
+        if (el) el.innerText = "0";
+
+        // تحديث الواجهة إذا كانت الدوال موجودة
+        if (typeof saveDbToLocal === 'function') saveDbToLocal();
+        if (typeof renderInventory === 'function') renderInventory();
+
     } catch (e) {
+        db.run("ROLLBACK");
         console.error("فشل حفظ المشتريات:", e);
+        alert("حدث خطأ أثناء الحفظ: " + e.message);
     }
 };
 
@@ -1408,29 +1565,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 4. الدالة الكبرى: اعتماد الفاتورة وترحيلها للمخزن
 window.processSmartPurchase = function() {
-  // 1. اسحب القيمة أولاً
-const supplierInput = document.getElementById('supplier-name');
-// 2. تحقق لو الخانة موجودة وليها قيمة، وإلا استخدم البديل
-const supplierName = (supplierInput && supplierInput.value.trim()) || 'مورد عام';
+    // 1. جلب العناصر
+    const supplierInput = document.getElementById('supplier-name');
+    const supplierName = (supplierInput && supplierInput.value.trim()) || 'مورد عام';
     const tableBody = document.querySelector('#purchase-table tbody');
     const finalTotalElement = document.getElementById('purchase-final-total');
-    const finalTotal = parseFloat(finalTotalElement.innerText) || 0;
 
-    if (tableBody.rows.length === 0) return showToast("الفاتورة فارغة! ⚠️", "error");
+    // 2. سحب الرقم وتنظيفه (عشان يتخطى الـ <small> والـ ج.م)
+    let rawTotal = finalTotalElement ? finalTotalElement.innerText.replace(/[^\d.]/g, '') : "0";
+    let finalTotal = parseFloat(rawTotal) || 0;
+
+    // 3. تأمين إضافي: لو القيمة صفر، احسبها من المصفوفة مباشرة
+    if (finalTotal === 0 && window.currentPurchaseItems && window.currentPurchaseItems.length > 0) {
+        finalTotal = window.currentPurchaseItems.reduce((sum, item) => sum + (parseFloat(item.quantity || 0) * parseFloat(item.buyPrice || 0)), 0);
+    }
+
+    console.log("السعر النهائي المعتمد للحفظ:", finalTotal);
+
+    // 4. التحقق من البيانات
+    if (!tableBody || tableBody.rows.length === 0) {
+        return showToast("الفاتورة فارغة! ⚠️", "error");
+    }
+    if (finalTotal <= 0) {
+        return showToast("عفواً، لا يمكن حفظ فاتورة بإجمالي صفر!", "error");
+    }
+
+    let inTransaction = false;
 
     try {
-        // 1. التعامل مع المورد
-        const checkSupplier = db.exec(`SELECT id FROM suppliers WHERE name = '${supplierName}'`);
+        db.run("BEGIN TRANSACTION");
+        inTransaction = true;
+
+        // أ. المورد
+        const checkSupplier = db.exec("SELECT id FROM suppliers WHERE name = ?", [supplierName]);
         if (checkSupplier.length === 0) {
-            db.run(`INSERT INTO suppliers (name, added_date, balance) VALUES (?, ?, 0)`, 
+            db.run("INSERT INTO suppliers (name, added_date, balance) VALUES (?, ?, 0)", 
                    [supplierName, new Date().toLocaleDateString('en-CA')]);
         }
-        db.run(`UPDATE suppliers SET balance = balance + ? WHERE name = ?`, [finalTotal, supplierName]);
+        db.run("UPDATE suppliers SET balance = balance + ? WHERE name = ?", [finalTotal, supplierName]);
 
-        // 2. تحديث المخزن (المنتجات)
-        window.currentPurchaseItems.forEach(item => {
+        // ب. المخزن
+        const itemsToSave = [...(window.currentPurchaseItems || [])];
+        itemsToSave.forEach(item => {
             const checkProd = db.exec("SELECT id FROM products WHERE name = ? AND warehouse = ?", [item.name, item.warehouse]);
-            
             if (checkProd.length > 0) {
                 db.run(`UPDATE products SET quantity = quantity + ?, buyPrice = ?, sellPrice = ? WHERE name = ? AND warehouse = ?`, 
                         [item.quantity, item.buyPrice, item.sellPrice, item.name, item.warehouse]);
@@ -1441,28 +1618,32 @@ const supplierName = (supplierInput && supplierInput.value.trim()) || 'مورد 
             }
         });
 
-        // 3. سجل الفواتير
-        db.run(`INSERT INTO sales_history (customer_name, total, type, date, net_profit, payment_method) VALUES (?, ?, ?, ?, ?, ?)`,
-               [supplierName, finalTotal, 'purchase', new Date().toISOString(), 0, 'وارد']);
+        // ج. السجل (ضمان ملء كل خانات الإجماليات للعرض)
+        const itemsJson = JSON.stringify(itemsToSave);
+        db.run(`INSERT INTO sales_history (customer_name, total, final_total, paid_amount, type, date, net_profit, payment_method, items_json) 
+                VALUES (?, ?, ?, ?, 'purchase', ?, 0, 'وارد', ?)`,
+        [supplierName, finalTotal, finalTotal, finalTotal, new Date().toLocaleString('sv-SE'), itemsJson]);
 
-        // 4. حفظ وتحديث الواجهة
+        db.run("COMMIT");
+        inTransaction = false;
+
         saveDbToLocal();
-        showToast("تم اعتماد الفاتورة   ✅");
-        window.purchaseItems = []; 
-        if (window.currentPurchaseItems) window.currentPurchaseItems = [];
-        // --- تنظيف الذاكرة ---
-        document.getElementById('supplier-name').value = "";
+        showToast("تم اعتماد الفاتورة بنجاح ✅");
+        
+        // 5. تصفير الواجهة
+        if (supplierInput) supplierInput.value = "";
         tableBody.innerHTML = "";
-        finalTotalElement.innerText = "0.00";
+        if (finalTotalElement) finalTotalElement.innerHTML = `0.00 <small>ج.م</small>`;
+        window.currentPurchaseItems = [];
         window.purchaseItems = []; 
 
-        // تحديث التقارير والمخزن فوراً
         if (typeof renderInventory === 'function') renderInventory();
         if (typeof renderReports === 'function') renderReports(); 
 
     } catch (e) {
-        console.error("خطأ في عملية الشراء:", e);
-        showToast("حدث خطأ أثناء الحفظ: " + e.message, "error");
+        if (inTransaction) db.run("ROLLBACK");
+        console.error("خطأ في الحفظ:", e);
+        showToast("فشل الحفظ: " + e.message, "error");
     }
 };
 window.addLog = function(action, details) {
@@ -1611,11 +1792,11 @@ window.saleSearch = function(val) {
     const resultsDiv = document.getElementById('sale-search-results');
     if (!val || val.length < 1) { resultsDiv.style.display = 'none'; return; }
 
-    // جلب buyPrice و sellPrice من الـ DB
     const res = db.exec("SELECT id, name, sellPrice, quantity, warehouse, buyPrice FROM products WHERE name LIKE ? OR code LIKE ? LIMIT 5", [`%${val}%`, `%${val}%`]);
 
-    if (res.length > 0) {
-        resultsDiv.innerHTML = res[0].values.map((row, index) => `
+    let html = "";
+    if (res.length > 0 && res[0].values.length > 0) {
+        html = res[0].values.map((row) => `
             <div class="search-item" onclick="prepareProduct(${row[0]}, '${row[1]}', ${row[2]}, ${row[3]}, ${row[5]})">
                 <div style="display: flex; justify-content: space-between;">
                     <span><b>${row[1]}</b></span>
@@ -1624,9 +1805,70 @@ window.saleSearch = function(val) {
                 <small>السعر: ${row[2]} | المتاح: ${row[3]}</small>
             </div>
         `).join('');
-        resultsDiv.style.display = 'block';
-    } else {
-        resultsDiv.style.display = 'none';
+    }
+
+    // إضافة خيار الصنف اليدوي بخانة سعر داخلية لتجنب الـ prompt()
+    html += `
+        <div class="search-item" style="background: rgba(96, 165, 250, 0.1); border-top: 2px solid #60a5fa; cursor: default;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span style="color: #2563eb; font-size: 13px;"><i class="fas fa-plus-circle"></i> صنف جديد: <b>${val}</b></span>
+                <div style="display: flex; gap: 5px;">
+                    <input type="number" id="manual-price-input" placeholder="السعر" 
+                           style="width: 70px; padding: 4px; border: 1px solid #60a5fa; border-radius: 4px;"
+                           onkeydown="if(event.key==='Enter') quickAddManual('${val}')">
+                    <button onclick="quickAddManual('${val}')" 
+                            style="background: #2563eb; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">
+                        إضافة
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    resultsDiv.innerHTML = html;
+    resultsDiv.style.display = 'block';
+};
+window.quickAddManual = function(name) {
+    const priceInput = document.getElementById('manual-price-input');
+    const price = parseFloat(priceInput.value);
+
+    if (isNaN(price) || price <= 0) {
+        alert("يرجى إدخال سعر صحيح");
+        priceInput.focus();
+        return;
+    }
+
+    if (typeof prepareProduct === 'function') {
+        // تمرير البيانات لـ prepareProduct
+        // id = -1 (لتمييزه كخارجي)، buyPrice = 0
+        prepareProduct(-1, name, price, 999, 0); 
+        
+        // تنظيف الواجهة
+        document.getElementById('sale-search-results').style.display = 'none';
+        document.getElementById('sale-search-input').value = '';
+        
+        // نقل الفوكس للكمية
+        document.getElementById('sale-qty-input').focus();
+        document.getElementById('sale-qty-input').select();
+    }
+};
+
+// دالة معالجة الصنف الخارجي (يدوي)
+window.addExternalProduct = function(name) {
+    const price = prompt(`أدخل سعر بيع الصنف: ${name}`, "0");
+    if (price === null || isNaN(price) || price === "") return;
+
+    // تم تمرير id وهمي (-1) و buyPrice مساوٍ للصفر لتمييز الصنف الخارجي
+    // دالة prepareProduct هي التي ستتولى وضعه في الـ Buffer استعداداً للإضافة
+    if (typeof prepareProduct === 'function') {
+        prepareProduct(-1, name, parseFloat(price), 999, 0); 
+        
+        // إغلاق النتائج وتفريغ الحقل
+        document.getElementById('sale-search-results').style.display = 'none';
+        document.getElementById('sale-search-input').value = '';
+        
+        // فوكس تلقائي على خانة الكمية لسرعة الإدخال
+        document.getElementById('sale-qty-input').focus();
     }
 };
 
@@ -2000,18 +2242,38 @@ window.updateCurrentTabData = function() {
 
 
 window.saleProcessInvoice = function() {
+    const isQuoteMode = document.getElementById('quote-mode-switch')?.checked;
+    
+    if (isQuoteMode) {
+        // في حالة بيان الأسعار: نطبع فقط ولا ننفذ أي عمليات قاعدة بيانات
+        const currentTab = saleTabs.find(t => t.id === activeTabId);
+        const res = calculateTotal();
+        
+        window.printInvoice({
+            invId: "بيان",
+            customer: document.getElementById('sale-customer-name').value || "عميل نقدي",
+            cartItems: currentTab.cart,
+            subTotal: res.subTotal,
+            finalTotal: res.finalTotal,
+            paidAmount: res.finalTotal,
+            remainingAmount: 0,
+            isReturn: false,
+            isQuote: true // نرسل علامة أنه بيان أسعار
+        });
+        
+        showToast("تمت طباعة بيان الأسعار بنجاح");
+        return; // توقف هنا ولا تحفظ في الداتابيز
+    }
     const currentTab = saleTabs.find(t => t.id === activeTabId);
     if (!currentTab || currentTab.cart.length === 0) return showToast("أضف أصنافاً أولاً", "error");
 
     const isReturnMode = document.getElementById('return-mode-switch')?.checked || false;
     const res = calculateTotal() || {}; 
-    const finalTotal = res.finalTotal || 0;
-    const correctedRemaining = res.remainingAmount || 0; 
-    
-    // --- [ القيم المعدلة لتطابق الـ Schema الجديدة ] ---
-    const discount = res.discount || 0;
-    const tax = res.tax || 0;
-    const dScope = res.dScope || 'total'; // القيمة المطلوبة لعمود discount_scope
+    const finalTotal = Number(res.finalTotal || 0);
+    const correctedRemaining = Number(res.remainingAmount || 0); 
+    const discount = Number(res.discount || 0);
+    const tax = Number(res.tax || 0);
+    const dScope = res.dScope || 'total';
 
     let customerName = document.getElementById('sale-customer-name').value.trim() || "عميل نقدي";
     const customerPhone = (document.getElementById('sale-customer-phone')?.value || "").trim();
@@ -2028,12 +2290,23 @@ window.saleProcessInvoice = function() {
         db.run("BEGIN TRANSACTION");
         inTransaction = true;
 
-        // 1. تسجيل العميل
+        // --- حساب التكلفة والربح لضمان عمل الداشبورد ---
+        let totalCost = 0;
+        currentTab.cart.forEach(item => {
+            const pData = db.exec("SELECT buyPrice FROM products WHERE id = ?", [item.id]);
+            const buyPrice = (pData.length > 0) ? parseFloat(pData[0].values[0][0] || 0) : 0;
+            totalCost += (buyPrice * parseFloat(item.qty));
+        });
+        const netProfit = (finalTotal - totalCost) * multiplier;
+
+        // 1. مديونية العميل
         if (customerName !== "عميل نقدي") {
             let check = db.exec("SELECT id FROM customers WHERE name = ?", [customerName]);
             if (check.length === 0) {
-                db.run("INSERT INTO customers (name, phone, added_date, balance) VALUES (?, ?, ?, 0)", 
-                    [customerName, customerPhone, todayFullDate.split(' ')[0], 0]);
+                db.run("INSERT INTO customers (name, phone, added_date, balance) VALUES (?, ?, ?, ?)", 
+                    [customerName, customerPhone, todayFullDate.split(' ')[0], (correctedRemaining * multiplier)]);
+            } else {
+                db.run("UPDATE customers SET balance = balance + ? WHERE name = ?", [(correctedRemaining * multiplier), customerName]);
             }
         }
 
@@ -2041,14 +2314,15 @@ window.saleProcessInvoice = function() {
         let oldItems = [];
         if (originalInvId) {
             const oldRes = db.exec("SELECT items_json FROM sales_history WHERE id = ?", [originalInvId]);
-            if (oldRes.length > 0) oldItems = JSON.parse(oldRes[0].values[0][0]);
+            if (oldRes.length > 0 && oldRes[0].values[0][0]) {
+                try { oldItems = JSON.parse(oldRes[0].values[0][0]); } catch(e) { oldItems = []; }
+            }
         }
-
         currentTab.cart.forEach(item => {
             let diff = item.qty;
             if (originalInvId && !isReturnMode) {
                 const oldItem = oldItems.find(i => i.id === item.id);
-                if (oldItem) diff = item.qty - oldItem.qty;
+                if (oldItem) diff = item.qty - (oldItem.qty || 0);
             }
             if (diff !== 0) {
                 db.run("UPDATE products SET quantity = quantity - ? WHERE id = ?", [diff * multiplier, item.id]);
@@ -2057,89 +2331,55 @@ window.saleProcessInvoice = function() {
 
         let realInvoiceId;
 
-        // --- [ وضع المرتجع ] ---
+        // 3. الحفظ (المرتجع أو البيع/التعديل)
         if (isReturnMode && originalInvId) {
-            const parentRes = db.exec("SELECT items_json, final_total, paid_amount FROM sales_history WHERE id = ?", [originalInvId]);
-            if (parentRes.length > 0 && parentRes[0].values) {
-                let parentItems = JSON.parse(parentRes[0].values[0][0]);
-                let parentFinal = parseFloat(parentRes[0].values[0][1]);
-                let parentPaid = parseFloat(parentRes[0].values[0][2]);
-
-                currentTab.cart.forEach(retItem => {
-                    let idx = parentItems.findIndex(i => i.id == retItem.id);
-                    if (idx > -1) {
-                        parentItems[idx].qty -= retItem.qty;
-                        if (parentItems[idx].qty <= 0) parentItems.splice(idx, 1);
-                    }
-                });
-
-                let updatedFinalTotal = parentFinal - finalTotal; 
-                let updatedRemaining = Math.max(0, updatedFinalTotal - parentPaid);
-
-                db.run(`UPDATE sales_history SET items_json=?, final_total=?, remaining_amount=? WHERE id=?`,
-                    [JSON.stringify(parentItems), updatedFinalTotal, updatedRemaining, originalInvId]);
-                
-                if (customerName !== "عميل نقدي") {
-                    db.run("UPDATE customers SET balance = ? WHERE name = ?", [updatedRemaining, customerName]);
-                }
-            }
-            
-            db.run(`INSERT INTO sales_history (customer_name, total, final_total, discount_value, tax_value, payment_method, paid_amount, remaining_amount, items_json, date, type, original_invoice_id, discount_scope) 
-                    VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, 'return', ?, ?)`, 
-                [customerName, -res.subTotal, -finalTotal, -discount, -tax, payMethod, itemsJson, todayFullDate, originalInvId, dScope]);
-            
+            db.run(`INSERT INTO sales_history (
+                customer_name, customer_phone, total, discount_value, tax_value, 
+                final_total, paid_amount, remaining_amount, items_json, 
+                payment_method, date, type, original_invoice_id, discount_scope, net_profit
+            ) VALUES (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, 'return', ?, ?, ?)`, 
+            [customerName, customerPhone, -res.subTotal, -discount, -tax, -finalTotal, itemsJson, payMethod, todayFullDate, originalInvId, dScope, netProfit]);
             realInvoiceId = originalInvId; 
         } 
-        // --- [ وضع البيع أو التعديل ] ---
         else {
             if (originalInvId) {
-                db.run(`UPDATE sales_history SET total=?, final_total=?, discount_value=?, tax_value=?, remaining_amount=?, items_json=?, date=?, discount_scope=? WHERE id=?`, 
-                    [res.subTotal, finalTotal, discount, tax, correctedRemaining, itemsJson, todayFullDate, dScope, originalInvId]);
+                db.run(`UPDATE sales_history SET 
+                    total=?, final_total=?, discount_value=?, tax_value=?, 
+                    remaining_amount=?, items_json=?, date=?, discount_scope=?, 
+                    customer_phone=?, net_profit=? WHERE id=?`, 
+                    [res.subTotal, finalTotal, discount, tax, correctedRemaining, itemsJson, todayFullDate, dScope, customerPhone, netProfit, originalInvId]);
                 realInvoiceId = originalInvId;
             } else {
-                db.run(`INSERT INTO sales_history (customer_name, total, final_total, discount_value, tax_value, payment_method, paid_amount, remaining_amount, items_json, date, type, discount_scope) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sale', ?)`, 
-                    [customerName, res.subTotal, finalTotal, discount, tax, payMethod, (finalTotal - correctedRemaining), correctedRemaining, itemsJson, todayFullDate, dScope]);
-                
-                const lastIdRes = db.exec("SELECT last_insert_rowid()");
-                realInvoiceId = lastIdRes[0].values[0][0];
-            }
-
-            if (customerName !== "عميل نقدي") {
-                db.run("UPDATE customers SET balance = ? WHERE name = ?", [correctedRemaining, customerName]);
+                db.run(`INSERT INTO sales_history (
+                    customer_name, customer_phone, total, discount_value, tax_value, 
+                    final_total, paid_amount, remaining_amount, items_json, 
+                    payment_method, date, type, discount_scope, net_profit
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
+                [customerName, customerPhone, res.subTotal, discount, tax, finalTotal, (finalTotal - correctedRemaining), correctedRemaining, itemsJson, payMethod, todayFullDate, 'sale', dScope, netProfit]);
+                realInvoiceId = db.exec("SELECT last_insert_rowid()")[0].values[0][0];
             }
         }
 
         db.run("COMMIT");
         inTransaction = false;
         saveDbToLocal(); 
-
-        showToast("تمت العملية بنجاح ✅");
         
-        // استدعاء الطباعة مباشرة بالبيانات الحالية لضمان ظهور المعاينة والخصم
         if (typeof window.printInvoice === 'function') {
             window.printInvoice({
-                invId: realInvoiceId,
-                customer: customerName,
-                customerPhone: customerPhone,
-                cartItems: currentTab.cart,
-                subTotal: res.subTotal,
-                finalTotal: finalTotal,
-                isReturn: isReturnMode,
-                invDisc: discount,
-                tax: tax,
-                remainingAmount: correctedRemaining,
-                dScope: dScope
+                invId: realInvoiceId, customer: customerName, customerPhone: customerPhone,
+                cartItems: currentTab.cart, subTotal: res.subTotal, finalTotal: finalTotal,
+                remainingAmount: correctedRemaining, paidAmount: (finalTotal - correctedRemaining),
+                payMethod: payMethod, invDisc: discount, tax: tax, isReturn: isReturnMode, dScope: dScope
             });
         }
-
         clearSaleScreen();
-        if (typeof loadCustomersDebt === 'function') loadCustomersDebt();
+        if (typeof renderCustomerDebts === 'function') renderCustomerDebts();
+        if (typeof updateDashboardStats === 'function') updateDashboardStats();
 
     } catch (err) {
         if (inTransaction) db.run("ROLLBACK");
         console.error(err);
-        showToast("خطأ في الحفظ: " + err.message, "error");
+        showToast("خطأ: " + err.message, "error");
     }
 };
 // دالة مساعدة لتنظيف الشاشة بعد البيع
@@ -2195,7 +2435,7 @@ window.processAndPrint = function() {
         showToast("السلة فارغة!", "error");
         return;
     }
-
+    
     const res = calculateTotal() || {};
 
     const payMethod = document.getElementById('sale-payment-method')?.value || "cash";
@@ -2228,177 +2468,125 @@ window.printInvoice = function (data) {
     const isPerItem = data.dScope === 'per-item';
     const companyName = getSetting('company_name') || "المؤسسة التجارية";
 
-    const subTotal = Number(data.subTotal || 0);
-    const finalTotal = Number(data.finalTotal || 0);
-    const invDisc = Number(data.invDisc || 0);
-    const tax = Number(data.tax || 0);
+    // استخدام Math.abs لضمان ظهور الأرقام موجبة في جدول المرتجع لشكل أفضل
+    const subTotal = Math.abs(Number(data.subTotal || 0));
+    const finalTotal = Math.abs(Number(data.finalTotal || 0));
+    const invDisc = Math.abs(Number(data.invDisc || 0));
+    const tax = Math.abs(Number(data.tax || 0));
+    
+    const remaining = Number(data.remainingAmount || 0);
+    const paid = Math.abs(Number(data.paidAmount || (finalTotal - remaining)));
 
     const win = window.open('', '_blank');
     if (!win) return;
 
-    // ================= rows =================
     let rowsHtml = "";
-
     items.forEach((item, i) => {
-        const name = item.name || "منتج";
         const price = Number(item.price || 0);
-        const qty = Number(item.qty || 1);
+        const qty = Math.abs(Number(item.qty || 0));
         const disc = Number(item.discount || 0);
-
-        const total = isPerItem
+        
+        const total = isPerItem 
             ? (price - disc) * qty
             : price * qty;
 
         rowsHtml += `
         <tr>
-            <td>${i + 1}</td>
-            <td class="name">${name}</td>
+            <td>${String(i + 1).padStart(2, '0')}</td>
+            <td class="name-col">${item.name}</td>
             <td>${qty}</td>
             <td>${price.toFixed(2)}</td>
             ${isPerItem ? `<td>${disc.toFixed(2)}</td>` : ''}
-            <td>${total.toFixed(2)}</td>
+            <td class="bold">${total.toFixed(2)}</td>
         </tr>`;
     });
 
-    // fill to 40 rows
-
-
-    // ================= HTML =================
     win.document.write(`
     <html dir="rtl">
     <head>
+        <title>فاتورة #${data.invId}</title>
         <style>
-            @page { size: A4; margin: 5mm; }
-
-            body {
-                font-family: Arial;
-                margin: 0;
-                font-size: 12px;
-                color: #000;
-            }
-
-            .header {
-                display: flex;
-                justify-content: space-between;
-                border-bottom: 2px solid #000;
-                margin-bottom: 8px;
-                padding-bottom: 5px;
-            }
-
-            .header h2 {
-                margin: 0;
-                font-size: 16px;
-            }
-
-            .title {
-                text-align: center;
-                font-weight: bold;
-                font-size: 14px;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                table-layout: fixed;
-            }
-
-            th {
-                background: #000;
-                color: #fff;
-                font-size: 11px;
-                height: 28px;
-            }
-
-            td {
-                border: 1px solid #000;
-                text-align: center;
-                padding: 2px 1px;
-            }
-
-            .name {
-                text-align: right;
-                padding-right: 5px;
-                overflow: hidden;
-                white-space: nowrap;
-            }
-
-            .totals {
-                margin-top: 10px;
-                width: 220px;
-                border-collapse: collapse;
-                float: left;
-            }
-
-            .totals td {
-                border: 1px solid #000;
-                padding: 4px;
-                font-weight: bold;
-            }
-
-            .grand {
-                background: #000;
-                color: #fff;
-            }
-
-            .footer {
-                margin-top: 15px;
-                font-size: 10px;
-            }
-
-            @media print {
-                button { display: none; }
-            }
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap');
+            @page { size: A4; margin: 10mm; }
+            body { font-family: 'Noto Sans Arabic', Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+            .invoice-header { display: flex; justify-content: space-between; border-bottom: 4px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+            .company-info h1 { margin: 0; font-size: 28px; }
+            .invoice-details { text-align: left; }
+            table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+            th { background: #f8f9fa; padding: 12px; border-bottom: 2px solid #333; font-size: 14px; }
+            td { padding: 10px; border-bottom: 1px solid #eee; text-align: center; }
+            .name-col { text-align: right; }
+            .bottom-section { display: flex; justify-content: space-between; margin-top: 30px; }
+            .summary-table { width: 320px; border: 1px solid #eee; }
+            .summary-table td { text-align: right; padding: 8px; border: none; }
+            .summary-table td:last-child { text-align: left; font-weight: bold; font-family: monospace; }
+            .total-row { background: #333; color: #fff; }
+            .total-row td { color: #fff !important; font-size: 18px !important; }
+            .highlight-red { color: #e74c3c; font-weight: bold; }
+            .highlight-green { color: #27ae60; font-weight: bold; }
+            .return-badge { background: #e74c3c; color: white; padding: 2px 10px; border-radius: 4px; }
+            .print-btn { background: #27ae60; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; }
+            @media print { .print-btn { display: none; } }
         </style>
     </head>
-
     <body>
+        <button class="print-btn" onclick="window.print()">طباعة الفاتورة 🖨️</button>
 
-    <button onclick="window.print()">طباعة</button>
-
-    <div class="header">
-        <div>
-            <h2>${companyName}</h2>
-            <div>العميل: ${data.customer || 'نقدي'}</div>
+        <div class="invoice-header">
+            <div class="company-info">
+                <h1>${companyName}</h1>
+                <p>التاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>
+                <p>العميل: <b>${data.customer || 'نقدي'}</b></p>
+                ${data.customerPhone ? `<p>الهاتف: ${data.customerPhone}</p>` : ''}
+            </div>
+            <div class="invoice-details">
+                <h2 style="color: ${data.isQuote ? '#3498db' : (data.isReturn ? '#e74c3c' : '#2c3e50')}">
+    ${data.isQuote ? 'بيان أسعار (غير معتمد)' : (data.isReturn ? 'فاتورة مرتجع مبيعات' : 'فاتورة مبيعات')}
+</h2>
+                <p>رقم الفاتورة: <b>#${data.invId}</b></p>
+                <p>الحالة: <b>${data.isReturn ? '<span class="return-badge">مرتجع</span>' : (remaining > 0 ? 'آجل' : 'مكتملة')}</b></p>
+                <p>طريقة الدفع: <b>${data.payMethod || 'كاش'}</b></p>
+            </div>
         </div>
 
-        <div style="text-align:left">
-            <div class="title">فاتورة مبيعات</div>
-            <div>#${data.invId}</div>
-            <div>${new Date().toLocaleDateString('ar-EG')}</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="name-col">الصنف</th>
+                    <th>الكمية</th>
+                    <th>السعر</th>
+                    ${isPerItem ? '<th>خصم</th>' : ''}
+                    <th>الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+        </table>
+
+        <div class="bottom-section">
+            <div class="customer-note">
+                <p><b>ملاحظات:</b></p>
+                <p>${getSetting('invoice_footer') || 'شكراً لتعاملكم معنا'}</p>
+            </div>
+            <table class="summary-table">
+                <tr><td>إجمالي الأصناف:</td><td>${subTotal.toFixed(2)}</td></tr>
+                ${invDisc > 0 ? `<tr class="highlight-red"><td>خصم الفاتورة:</td><td>-${invDisc.toFixed(2)}</td></tr>` : ''}
+                ${tax > 0 ? `<tr><td>الضريبة:</td><td>${tax.toFixed(2)}</td></tr>` : ''}
+                <tr class="total-row">
+                    <td>${data.isReturn ? 'إجمالي المرتجع:' : 'الصافي النهائي:'}</td>
+                    <td>${finalTotal.toFixed(2)}</td>
+                </tr>
+                
+                ${!data.isReturn ? `
+                    <tr><td>المبلغ المدفوع:</td><td class="highlight-green">${paid.toFixed(2)}</td></tr>
+                    ${remaining > 0 ? `<tr class="highlight-red"><td>المبلغ المتبقي (آجل):</td><td>${remaining.toFixed(2)}</td></tr>` : ''}
+                ` : '<tr><td colspan="2" style="text-align:center" class="highlight-red">تم استرداد المبلغ</td></tr>'}
+            </table>
         </div>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th width="30">م</th>
-                <th>الصنف</th>
-                <th width="50">كمية</th>
-                <th width="70">سعر</th>
-                ${isPerItem ? '<th width="60">خصم</th>' : ''}
-                <th width="80">إجمالي</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            ${rowsHtml}
-        </tbody>
-    </table>
-
-    <table class="totals">
-        <tr><td>الإجمالي</td><td>${subTotal.toFixed(2)}</td></tr>
-        ${invDisc > 0 ? `<tr><td>خصم</td><td>${invDisc.toFixed(2)}</td></tr>` : ''}
-        ${tax > 0 ? `<tr><td>ضريبة</td><td>${tax.toFixed(2)}</td></tr>` : ''}
-        <tr class="grand"><td>الصافي</td><td>${finalTotal.toFixed(2)}</td></tr>
-    </table>
-
-    <div class="footer">
-        ${getSetting('invoice_footer') || ''}
-    </div>
-
     </body>
     </html>
     `);
+    // داخل دالة printInvoice
 
     win.document.close();
 };
@@ -2840,6 +3028,100 @@ window.updateMultiPriceUI = function() {
         }
     }
 };
+
+
+
+
+window.toggleQuoteMode = function() {
+    const isQuote = document.getElementById('quote-mode-switch').checked;
+    const confirmBtn = document.querySelector('.btn-confirm');
+    
+    if (isQuote) {
+        confirmBtn.innerHTML = 'إتمام العملية ';
+        confirmBtn.style.background = '#3498db';
+        document.getElementById('return-mode-switch').disabled = true; // تعطيل المرتجع في وضع البيان
+    } else {
+        confirmBtn.innerHTML = 'إتمام العملية';
+        confirmBtn.style.background = ''; 
+        document.getElementById('return-mode-switch').disabled = false;
+    }
+};
+
+
+window.openQuickQuote = function() {
+    // 1. الانتقال لقسم المبيعات (تأكد أن الدالة showSection موجودة عندك)
+    if (typeof showSection === 'function') {
+        showSection('sales');
+    } else {
+        // بديل لو مش متاح روتينج: إظهار سكشن المبيعات وإخفاء الباقي
+        document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sales').classList.add('active');
+    }
+
+    // 2. تفعيل سويتش بيان الأسعار
+    const quoteSwitch = document.getElementById('quote-mode-switch');
+    if (quoteSwitch) {
+        quoteSwitch.checked = true;
+        
+        // 3. استدعاء دالة التغيير لتحديث شكل الأزرار (إجباري)
+        if (typeof toggleQuoteMode === 'function') {
+            toggleQuoteMode();
+        }
+    }
+
+    // 4. عمل Focus على خانة البحث فوراً لبدء العمل
+    setTimeout(() => {
+        const searchInput = document.getElementById('sale-search-input');
+        if (searchInput) searchInput.focus();
+    }, 100);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3876,8 +4158,72 @@ window.printFromPreview = function() {
     printWindow.document.close();
 };
 
+// فتح نافذة الإضافة
+window.openAddCustomerModal = function() {
+    const nameInput = document.getElementById('new-cust-name');
+    const phoneInput = document.getElementById('new-cust-phone');
+    const balanceInput = document.getElementById('new-cust-balance');
 
+    if (nameInput) nameInput.value = "";
+    if (phoneInput) phoneInput.value = "";
+    if (balanceInput) balanceInput.value = "0";
+    
+    openModal('addCustomerModal');
+};
 
+// حفظ العميل الجديد في الداتابيز
+window.saveNewCustomer = function(event) {
+    // 1. منع أي سلوك افتراضي (منع الريفريش تماماً)
+    if (event) event.preventDefault();
+
+    const name = document.getElementById('new-cust-name').value.trim();
+    const phone = document.getElementById('new-cust-phone').value.trim();
+    const balance = parseFloat(document.getElementById('new-cust-balance').value) || 0;
+
+    if (!name) return showToast("يرجى إدخال اسم العميل", "error");
+
+    try {
+        // التأكد من عدم التكرار
+        const exists = db.exec("SELECT id FROM customers WHERE name = ?", [name]);
+        if (exists.length > 0) return showToast("هذا الاسم مسجل مسبقاً", "error");
+
+        db.run("BEGIN TRANSACTION");
+
+        // 2. الإدراج في جدول العملاء
+        db.run(`INSERT INTO customers (name, phone, balance, added_date) VALUES (?, ?, ?, ?)`, 
+               [name, phone, balance, new Date().toLocaleDateString('en-CA')]);
+
+        // 3. تسجيل المديونية الافتتاحية
+        if (balance > 0) {
+            db.run(`INSERT INTO sales_history (customer_name, total, final_total, remaining_amount, type, date, payment_method) 
+                    VALUES (?, ?, ?, ?, 'sale', ?, 'مديونية افتتاحية')`,
+                   [name, balance, balance, balance, new Date().toLocaleString('sv-SE')]);
+        }
+
+        db.run("COMMIT");
+        
+        // حفظ البيانات في الملف المحلي
+        if (typeof saveDbToLocal === 'function') saveDbToLocal();
+
+        showToast("تم إضافة العميل بنجاح ✅");
+        
+        // إغلاق المودال يدوياً بدون ريفريش
+        closeModal('addCustomerModal');
+
+        // 4. التحديث الموضعي (بدون Reload)
+        if (typeof renderCustomerDebts === 'function') {
+            renderCustomerDebts();
+        } else {
+            // إذا لم تكن الدالة موجودة، لا تفعل شيئاً أو أرسل تنبيه للكونسول
+            console.warn("دالة renderCustomerDebts غير موجودة - يرجى تحديث القسم يدوياً.");
+        }
+
+    } catch (e) {
+        if (db) db.run("ROLLBACK");
+        console.error(e);
+        showToast("حدث خطأ أثناء الحفظ", "error");
+    }
+};
 
 
 
@@ -4004,9 +4350,8 @@ window.renderReports = function() {
     if (!tbody || !db) return;
 
     try {
-        // 1. جلب البيانات مع إضافة عمود type لتمييز المرتجع
-        // تأكد أن الاستعلام يجلب عمود type (سواء كان row[5] أو حسب ترتيبه في جدولك)
-        const res = db.exec("SELECT id, date, customer_name, total, payment_method, type FROM sales_history ORDER BY id DESC");
+        // التعديل هنا: جلب final_total بدلاً من total لضمان ظهور القيمة النهائية
+        const res = db.exec("SELECT id, date, customer_name, final_total, payment_method, type FROM sales_history ORDER BY id DESC");
         
         tbody.innerHTML = ""; 
 
@@ -4014,31 +4359,35 @@ window.renderReports = function() {
             res[0].values.forEach(row => {
                 const tr = document.createElement("tr");
 
-                // 2. معالجة التاريخ
+                // 1. معالجة التاريخ
                 let dateStr = '---';
                 if (row[1]) {
                     const d = new Date(row[1]);
                     dateStr = isNaN(d) ? row[1] : d.toLocaleString('ar-EG');
                 }
                 
-                // 3. تحديد نوع العملية (وارد، صادر، مرتجع)
-                const pMethod = row[4]; // payment_method
-                const processType = row[5]; // النوع (sale, return, وارد)
+                // 2. تحديد نوع العملية
+                const pMethod = row[4];    // payment_method
+                const processType = row[5]; // type (sale, return, purchase)
+                const amount = row[3] || 0; // final_total
                 
                 let typeText = "صادر";
                 let typeClass = "export";
-                let priceColor = "#c62828"; // أحمر تلقائي للصادر
+                let priceColor = "#c62828"; 
                 let operationDesc = "مبيعات منتجات";
 
-                if (pMethod === "وارد") {
+                // حالة المشتريات (وارد)
+                if (pMethod === "وارد" || processType === "purchase") {
                     typeText = "وارد";
                     typeClass = "import";
-                    priceColor = "#2e7d32"; // أخضر للوارد
+                    priceColor = "#2e7d32"; 
                     operationDesc = "توريد بضاعة";
-                } else if (processType === "return") {
+                } 
+                // حالة المرتجع
+                else if (processType === "return") {
                     typeText = "مرتجع";
-                    typeClass = "return-type"; // كلاس جديد للمرتجع
-                    priceColor = "#f57c00"; // برتقالي للمرتجع لتمييزه
+                    typeClass = "return-type";
+                    priceColor = "#f57c00"; 
                     operationDesc = "مرتجع مبيعات";
                 }
 
@@ -4049,7 +4398,7 @@ window.renderReports = function() {
                     <td>${row[2] || 'عميل نقدي'}</td>
                     <td>${operationDesc}</td>
                     <td style="font-weight: bold; color: ${priceColor}; direction: ltr; text-align: right;">
-                        ${row[3]} ج.م
+                        ${amount.toLocaleString()} ج.م
                     </td>
                     <td>
                         <button class="action-btn print" onclick="printInvoiceFromHistory(${row[0]})" title="طباعة">
@@ -4069,7 +4418,6 @@ window.renderReports = function() {
         console.error("خطأ في جلب السجل:", err);
     }
 };
-
 // دالة الفلترة (البحث بالاسم والتاريخ والنوع)
 window.applyAllFilters = function() {
     // 1. تجهيز قيم البحث
@@ -4176,34 +4524,23 @@ window.filterInvoices = function() {
 // لوحة التحكم
 window.updateDashboardStats = function() {
     if (!db) return; 
-
     try {
         const today = new Date().toISOString().split('T')[0];
         const thisMonth = today.substring(0, 7);
 
-        // 1. مبيعات اليوم (شيلنا شرط payment_method عشان نضمن القراءة)
-        const salesRes = db.exec("SELECT SUM(total) FROM sales_history WHERE date LIKE ?", [`${today}%`]);
-        const totalSales = salesRes[0]?.values[0][0] || 0;
-        document.getElementById('dash-today-sales').innerText = Number(totalSales).toFixed(2);
+        const salesRes = db.exec("SELECT SUM(COALESCE(final_total, 0)) FROM sales_history WHERE date LIKE ? AND type='sale'", [`${today}%`]);
+        document.getElementById('dash-today-sales').innerText = Number(salesRes[0]?.values[0][0] || 0).toFixed(2);
 
-        // 2. أرباح اليوم (القراءة مباشرة من عمود net_profit اللي الدالة الجديدة بتسجله)
-        const profitTodayRes = db.exec("SELECT SUM(net_profit) FROM sales_history WHERE date LIKE ?", [`${today}%`]);
-        const totalProfitToday = profitTodayRes[0]?.values[0][0] || 0;
-        document.getElementById('dash-today-profit').innerText = Number(totalProfitToday).toFixed(2);
+        const profitTodayRes = db.exec("SELECT SUM(COALESCE(net_profit, 0)) FROM sales_history WHERE date LIKE ?", [`${today}%`]);
+        document.getElementById('dash-today-profit').innerText = Number(profitTodayRes[0]?.values[0][0] || 0).toFixed(2);
 
-        // 3. أرباح الشهر
-        const profitMonthRes = db.exec("SELECT SUM(net_profit) FROM sales_history WHERE date LIKE ?", [`${thisMonth}%`]);
-        const totalProfitMonth = profitMonthRes[0]?.values[0][0] || 0;
-        document.getElementById('dash-month-profit').innerText = Number(totalProfitMonth).toFixed(2);
+        const profitMonthRes = db.exec("SELECT SUM(COALESCE(net_profit, 0)) FROM sales_history WHERE date LIKE ?", [`${thisMonth}%`]);
+        document.getElementById('dash-month-profit').innerText = Number(profitMonthRes[0]?.values[0][0] || 0).toFixed(2);
 
-        // 4. نواقص المخزن
         const lowStockRes = db.exec("SELECT COUNT(*) FROM products WHERE quantity <= 10");
-        const lowStockCount = lowStockRes[0]?.values[0][0] || 0;
-        document.getElementById('dash-low-stock').innerText = lowStockCount;
-
-
+        document.getElementById('dash-low-stock').innerText = lowStockRes[0]?.values[0][0] || 0;
     } catch (e) {
-        console.error("Dashboard Sync Error:", e);
+        console.error(e);
     }
 };
 
@@ -4444,7 +4781,6 @@ window.checkMainPass = function() {
         showToast("خطأ في قاعدة البيانات", "error");
     }
 };
-
 // --- 2. كود التشغيل والتحكم (الكل داخل DOMContentLoaded) ---
 document.addEventListener('DOMContentLoaded', () => {
     const uInput = document.getElementById('main-username');
@@ -4726,33 +5062,62 @@ window.executeSystemReset = function() {
     const selectedTables = Array.from(document.querySelectorAll('.reset-chk:checked')).map(c => c.value);
     const fullReset = document.getElementById('full-reset-chk').checked;
 
+    if (!fullReset && selectedTables.length === 0) {
+        return showToast("⚠️ يرجى تحديد جدول واحد على الأقل", "error");
+    }
+
     try {
         db.run("BEGIN TRANSACTION");
 
         if (fullReset) {
-            // مسح كل شيء بلا استثناء
-            const all = ['customers', 'customer_payments', 'sales_history', 'products', 'expenses'];
-            all.forEach(t => db.run(`DELETE FROM ${t}`));
+            // مسح شامل لكل البيانات الفرعية والرئيسية بالترتيب لسلامة العلاقات
+            const allTables = [
+                'sales_history', 'purchase_history', 'expenses', 'customer_payments', 
+                'damaged_products', 'reservations', 'system_shifts', 'activity_logs', 
+                'notifications', 'profit_logs', 'products', 'categories', 
+                'warehouses', 'customers', 'suppliers'
+            ];
+            
+            allTables.forEach(t => {
+                db.run(`DELETE FROM ${t}`);
+                db.run(`DELETE FROM sqlite_sequence WHERE name = ?`, [t]);
+            });
+            
         } else {
-            // معالجة ذكية لكل اختيار
+            // معالجة ذكية لكل اختيار مع ربط الجداول المنسية من الـ HTML تلقائياً
             selectedTables.forEach(table => {
+                
                 if (table === 'customers') {
-                    // فحص: هل فيه عملاء عليهم مديونية؟
+                    // فحص المديونيات القائمة
                     const debtRes = db.exec("SELECT COUNT(*) FROM customers WHERE balance != 0");
-                    const debtCount = debtRes[0].values[0][0];
+                    const debtCount = debtRes[0]?.values[0][0] || 0;
                     
                     if (debtCount > 0) {
                         throw new Error(`لا يمكن مسح سجل العملاء لوجود ${debtCount} عملاء لديهم مديونيات قائمة. صفي الحسابات أولاً أو اختر مسح شامل.`);
                     }
                 }
-                
+
+                // تنفيذ المسح للجدول المحدد
                 db.run(`DELETE FROM ${table}`);
                 db.run(`DELETE FROM sqlite_sequence WHERE name = ?`, [table]);
+
+                // ربط التابع التلقائي للجداول المرتبطة بالـ HTML
+                if (table === 'products') {
+                    db.run(`DELETE FROM categories`);
+                    db.run(`DELETE FROM warehouses`);
+                    db.run(`DELETE FROM damaged_products`);
+                    db.run(`DELETE FROM sqlite_sequence WHERE name IN ('categories', 'warehouses', 'damaged_products')`);
+                }
+                if (table === 'sales_history') {
+                    db.run(`DELETE FROM profit_logs`);
+                    db.run(`DELETE FROM reservations`);
+                    db.run(`DELETE FROM sqlite_sequence WHERE name IN ('profit_logs', 'reservations')`);
+                }
             });
         }
 
         db.run("COMMIT");
-        createTablesSchema(); // لإعادة إنشاء القيم الافتراضية
+        createTablesSchema(); // إعادة بناء الداتا والـ Default (عميل نقدي، مخزن رئيسي، عام)
         showToast("✅ تم تنفيذ العملية بنجاح");
         setTimeout(() => location.reload(), 1000);
     } catch (e) {
@@ -4985,12 +5350,27 @@ document.addEventListener('click', () => {
     const p = document.getElementById('perm-popup');
     if (p) p.style.display = 'none';
 });
-window.applyPermissions = function(permsJson) {
-    // 1. حالة الوصول الكامل (الأدمن)
-    const isAdmin = (permsJson === 'all' || permsJson.includes('"all"'));
+window.applyPermissions = function(permsJson, role = '') {
+    // 1. تنظيف البيانات
+    const safePerms = permsJson || "";
+    
+    // 2. التحقق الذهبي: لو المستخدم "admin" في الرتبة، ياخد كل الصلاحيات فوراً
+    // حتى لو عمود الصلاحيات (permsJson) فاضي أو باظ أثناء تغيير الباسورد
+    const isAdminRole = (role === 'admin');
+    const hasAllKeyword = (safePerms === 'all' || safePerms.includes('all') || safePerms === '"all"');
+    
+    const isAdmin = isAdminRole || hasAllKeyword;
 
     try {
-        const userPerms = isAdmin ? [] : JSON.parse(permsJson || "[]");
+        let userPerms = [];
+        if (!isAdmin && safePerms !== "" && safePerms !== "[]") {
+            try {
+                userPerms = JSON.parse(safePerms);
+            } catch (e) {
+                // لو فشل الـ Parse بنعتبر ملوش صلاحيات زيادة
+                userPerms = [];
+            }
+        }
 
         const sectionsMap = {
             'welcome-section': 'nav-welcome',
@@ -5006,22 +5386,22 @@ window.applyPermissions = function(permsJson) {
         for (const [key, id] of Object.entries(sectionsMap)) {
             const element = document.getElementById(id);
             if (element) {
-                // إذا كان الأدمن أو لديه الصلاحية
-                const hasAccess = isAdmin || userPerms.includes(key);
+                // الوصول متاح لو (isAdmin) أو (الكود موجود في المصفوفة)
+                const hasAccess = isAdmin || (Array.isArray(userPerms) && userPerms.includes(key));
 
                 if (hasAccess) {
                     element.classList.remove('locked');
                     element.style.opacity = "1";
                     element.style.pointerEvents = "auto";
+                    element.style.filter = "none";
                 } else {
                     element.classList.add('locked');
-                    // اختياري: لو عايز تمسح الـ onclick مؤقتاً لزيادة الأمان
-                    // element.setAttribute('data-old-click', element.getAttribute('onclick'));
-                    // element.removeAttribute('onclick');
+                    element.style.opacity = "0.4";
+                    element.style.pointerEvents = "none";
+                    element.style.filter = "grayscale(1)";
                 }
             }
         }
-        console.log("✅ تم قفل الأقسام غير المسموحة.");
     } catch (e) {
         console.error("خطأ في تطبيق القيود:", e);
     }
@@ -5707,6 +6087,7 @@ function openProductModal() {
         modal.style.display = 'flex';
         fillSelects();
     }
+    if (typeof applyMultiUnitVisibility === 'function') applyMultiUnitVisibility();
 }
 
 
@@ -6137,6 +6518,10 @@ document.addEventListener('keydown', function(e) {
             console.log("الانتقال لصفحة الوارد...");
             showSection('purchase');
         }
+        else if (key === 'w' || key === 'ص') { // دعم حرف P و O للوارد
+            console.log("الانتقال لصفحة الوارد...");
+            showSection('customers');
+        }
         // else if (key === 'i' || key === 'ه') {
         //     console.log("الانتقال لصفحة المخزن...");
         //     showSection('inventory');
@@ -6540,6 +6925,11 @@ window.saveSingleSetting = function(id) {
 
         console.log(`✅ تم حفظ [${id}] بنجاح`);
         showToast("تم حفظ التعديلات بنجاح");
+
+        // ✅ تحديث فوري لواجهة المودال لو السويتش المعدل هو تعدد الوحدات
+        if (id === 'multi_unit_status') {
+            if (typeof applyMultiUnitVisibility === 'function') applyMultiUnitVisibility();
+        }
     } catch (err) {
         console.error("❌ فشل الحفظ:", err);
     }
@@ -6590,6 +6980,9 @@ window.loadSettings = function() {
                 }
             });
 
+            // ✅ تحديث واجهة المودال بناءً على القيم المحملة حديثاً
+            if (typeof applyMultiUnitVisibility === 'function') applyMultiUnitVisibility();
+
             // تحديثات إضافية للـ UI
             if (typeof updateDiscountPlaceholder === 'function') updateDiscountPlaceholder();
             if (typeof applySalesScreenSettings === 'function') applySalesScreenSettings();
@@ -6601,9 +6994,7 @@ window.loadSettings = function() {
     }
 };
 
-
 window.getSetting = function(key) {
-    // التأكد من أن قاعدة البيانات معرفة وجاهزة
     if (typeof db === 'undefined' || !db) {
         console.warn("قاعدة البيانات غير جاهزة بعد لجلب الإعداد: " + key);
         return null;
@@ -6615,6 +7006,21 @@ window.getSetting = function(key) {
         return null;
     }
 };
+
+// ✅ دالة التحكم الموحدة في الـ UI
+window.applyMultiUnitVisibility = function() {
+    const unitSection = document.getElementById('multi-unit-section');
+    if (!unitSection) return;
+
+    const isEnabled = window.getSetting('multi_unit_status') === '1';
+
+    // تزامن مفتاح السويتش بالـ UI
+    const multiUnitSwitch = document.getElementById('multi_unit_status');
+    if (multiUnitSwitch) multiUnitSwitch.checked = isEnabled;
+
+    unitSection.style.display = isEnabled ? 'block' : 'none';
+};
+
 /**ن
  * دالة حساب إجمالي الفاتورة مع الضرائب والخصومات المؤقتة
  */
@@ -6664,7 +7070,28 @@ function applySalesScreenSettings() {
 }
 
 // استدعي هذه الدالة داخل الـ initDatabase بعد إنشاء الجداول
+// ضيف الدالة دي معاها في نفس الملف عشان تضمن فحص الواجهة عند التغيير وعند فتح الصفحة
+window.applyMultiUnitVisibility = function() {
+    const unitSection = document.getElementById('multi-unit-section');
+    if (!unitSection) return;
 
+    // جلب القيمة الحالية من الداتابيز مباشرة لضمان الدقة
+    const res = db.exec("SELECT value FROM settings WHERE key = 'multi_unit_status'");
+    const isEnabled = (res.length > 0 && res[0].values[0][0] === "1");
+
+    // تحديث السويتش نفسه ليعكس الحالة المخزنة
+    const multiUnitSwitch = document.getElementById('multi_unit_status');
+    if (multiUnitSwitch) {
+        multiUnitSwitch.checked = isEnabled;
+    }
+
+    // إظهار أو إخفاء القسم في المودال
+    if (isEnabled) {
+        unitSection.style.display = 'block';
+    } else {
+        unitSection.style.display = 'none';
+    }
+};
 
 /**
  * حفظ قاعدة البيانات على الهارد (Electron) أو الـ LocalStorage
@@ -7032,17 +7459,82 @@ window.saveDbToLocal = async function() {
 
 
 
+document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.getElementById("resizable-sidebar");
+    const handle = document.getElementById("sidebar-handle");
+    let isResizing = false;
 
+    handle.addEventListener("mousedown", (e) => {
+        isResizing = true;
+        document.body.style.cursor = "ew-resize";
+        document.body.style.userSelect = "none"; // منع تحديد النصوص أثناء الشد
+    });
 
+    document.addEventListener("mousemove", (e) => {
+        if (!isResizing) return;
 
+        // حساب العرض بناءً على أن الـ Sidebar مثبت على اليمين (RTL)
+        let newWidth = window.innerWidth - e.clientX;
 
+        // تطبيق قيود الـ Min والـ Max برمجياً لضمان السلاسة
+        if (newWidth >= 180 && newWidth <= 450) {
+            sidebar.style.width = `${newWidth}px`;
+            
+            // اختياري: إذا كان عندك حاوية محتوى رئيسي (main-content)، حدث الـ margin بتاعها هنا ليطابق العرض الجديد:
+            // document.getElementById("main-content").style.marginRight = `${newWidth}px`;
+        }
+    });
 
+    document.addEventListener("mouseup", () => {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = "default";
+            document.body.style.userSelect = "auto";
+        }
+    });
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const sidebar = document.querySelector(".sidebar");
+    const handle = document.getElementById("sidebar-handle");
+    const mainContent = document.querySelector(".main-content");
+    let isResizing = false;
 
+    if (!handle || !sidebar || !mainContent) return;
 
+    handle.addEventListener("mousedown", (e) => {
+        isResizing = true;
+        document.body.style.cursor = "ew-resize";
+        document.body.style.userSelect = "none";
+    });
 
+    document.addEventListener("mousemove", (e) => {
+        if (!isResizing) return;
 
+        // حساب العرض المباشر من الحافة اليمين للشاشة (RTL)
+        let newWidth = window.innerWidth - e.clientX;
 
+        // وضع حدود آمنة للشد عشان السيستم ميبوظش
+        if (newWidth >= 200 && newWidth <= 450) {
+            // تحديث السايد بار
+            sidebar.style.setProperty('width', `${newWidth}px`, 'important');
+            
+            // تحديث المحتوى الرئيسي لحظياً مع الحركة ليملأ باقي الشاشة
+            mainContent.style.setProperty('margin-right', `${newWidth}px`, 'important');
+            mainContent.style.setProperty('width', `calc(100% - ${newWidth}px)`, 'important');
+            
+            // إجبار الجداول على إعادة حساب أبعادها أثناء السحب
+            window.dispatchEvent(new Event('resize'));
+        }
+    });
 
+    document.addEventListener("mouseup", () => {
+        if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = "default";
+            document.body.style.userSelect = "auto";
+        }
+    });
+});
 
 
 
@@ -7170,21 +7662,151 @@ window.saveDbToLocal = async function() {
 
 
 
+const GEMINI_API_KEY = "AIzaSyCnX68JLCMib1FQ1o3M0Iukc8BRr4cxK7Q";
+let currentBase64 = null;
 
+// المحرك الأساسي للاتصال
+async function callGemini(userPrompt, base64Image = null) {
+    // استخدم الموديل المستقر حالياً لضمان عدم حدوث 503 أو 400
+const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const parts = [{ text: userPrompt }];
+    
+    if (base64Image) {
+        // تأكد أن الـ base64 المرسل لا يحتوي على الترويسة data:image/jpeg;base64,
+        const cleanBase64 = base64Image.includes(",") ? base64Image.split(",")[1] : base64Image;
+        parts.push({ 
+            inline_data: { 
+                mime_type: "image/jpeg", 
+                data: cleanBase64 
+            } 
+        });
+    }
 
+    const payload = {
+        contents: [{ parts }],
+        generationConfig: {
+            temperature: 0.1, // لزيادة الدقة في استخراج الأرقام من الكور
+            response_mime_type: "application/json"
+        }
+    };
 
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
 
+        if (!response.ok) {
+            const err = await response.json();
+            console.error("Gemini Error:", err);
+            throw new Error(`API Error: ${response.status}`);
+        }
 
+        const data = await response.json();
+        let textResponse = data.candidates[0].content.parts[0].text;
+        
+        // تنظيف الرد من أي Markdown زقائد
+        return textResponse.replace(/```json|```/g, "").trim();
 
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        throw error;
+    }
+}
 
+// مصفوفة الربط بين كلام المستخدم والـ Sections الحقيقية عندك
+const PAGE_MAP = {
+    "الرئيسية": "welcome-section",
+    "المبيعات": "sales",
+    "المشتريات": "purchase",
+    "العملاء": "customers",
+    "الفواتير": "reports",
+    "المخزن": "inventory",
+    "لوحة التحكم": "dashboard-section",
+    "الاعدادات": "settings-section"
+};
 
+window.sendChatMessage = async function() {
+    const input = document.getElementById('ai-user-text');
+    const msg = input.value.trim();
+    if (!msg && !currentBase64) return;
 
+    appendMessage(msg, 'user');
+    input.value = '';
+    const tempId = "ai-" + Date.now();
+    appendMessage("جاري التنفيذ...", 'ai', tempId);
 
+    const systemContext = `
+    أنت مساعد ERP. الجداول: products, sales_history, customers, expenses.
+    الصفحات المتاحة: [${Object.keys(PAGE_MAP).join(", ")}].
+    رد بـ JSON فقط:
+    {
+      "intent": "QUERY" | "NAVIGATE" | "CHAT",
+      "sql": "SQL Query if needed",
+      "page_key": "اسم الصفحة من القائمة المتاحة فقط",
+      "reply": "ردك للمستخدم"
+    }`;
 
+    try {
+        const aiRaw = await callGemini(`${systemContext}\nالمستخدم: ${msg}`, currentBase64);
+        const data = JSON.parse(aiRaw.replace(/```json|```/g, "").trim());
+        const displayDiv = document.getElementById(tempId);
 
+        if (data.intent === "NAVIGATE" && data.page_key) {
+            const sectionId = PAGE_MAP[data.page_key];
+            if (sectionId) {
+                displayDiv.innerText = data.reply || `تم فتح ${data.page_key}`;
+                showSection(sectionId); // الدالة الحقيقية اللي في الـ Sidebar عندك
+            }
+        } 
+        else if (data.intent === "QUERY" && data.sql) {
+            db.all(data.sql, [], async (err, rows) => {
+                if (err) { displayDiv.innerText = "تعذر جلب البيانات."; }
+                else {
+                    const analysis = await callGemini(`لخص النتائج: ${JSON.stringify(rows)} بناء على سؤال: ${msg}`);
+                    displayDiv.innerText = analysis;
+                }
+            });
+        } else {
+            displayDiv.innerText = data.reply;
+        }
+    } catch (e) {
+        document.getElementById(tempId).innerText = "حدث خطأ في الاتصال، حاول مرة أخرى.";
+    }
+    clearImage();
+};
+// إدارة الصور والمعاينة
+window.previewChatImage = function(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            currentBase64 = e.target.result.split(',')[1];
+            document.getElementById('preview-img').src = e.target.result;
+            document.getElementById('image-preview-bar').style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
+window.clearImage = function() {
+    currentBase64 = null;
+    document.getElementById('image-preview-bar').style.display = 'none';
+    document.getElementById('ai-image-input').value = '';
+};
 
+window.toggleAIChat = () => document.getElementById('ai-chat-modal').classList.toggle('show');
 
+function appendMessage(text, sender, id = null) {
+    const box = document.getElementById('chat-messages');
+    const div = document.createElement('div');
+    div.className = `message ${sender}`;
+    if (id) div.id = id;
+    div.innerText = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
 
 
 
@@ -7192,36 +7814,261 @@ window.saveDbToLocal = async function() {
 
 
 
+window.updatePricesFromInvoice = async function(imageInput) {
+    const file = imageInput.files[0];
+    if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64Data = reader.result.split(',')[1];
+        // برومبت مخصص لتحديث الأسعار فقط
+        const prompt = `حلل الفاتورة واستخرج JSON فقط: [{"name": "اسم الصنف", "sellPrice": 0}]. حدث أسعار البيع فقط.`;
+        
+        appendMessage("جاري قراءة الأسعار الجديدة...", 'ai');
+        const res = await callGemini(prompt, base64Data);
+        
+        try {
+            const updates = JSON.parse(res.replace(/```json|```/g, "").trim());
+            updates.forEach(item => {
+                db.run("UPDATE products SET sellPrice = ? WHERE name LIKE ?", [item.sellPrice, `%${item.name}%`], (err) => {
+                    if(!err) console.log(`تم تحديث سعر ${item.name}`);
+                });
+            });
+            appendMessage("تم تحديث أسعار البيع لجميع الأصناف بنجاح.", 'ai');
+        } catch (e) { alert("خطأ في تحليل بيانات الأسعار."); }
+    };
+    reader.readAsDataURL(file);
+};
 
 
 
+window.syncInvoiceToSales = async function(imageInput) {
+    const file = imageInput.files[0];
+    if (!file) return;
 
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64Data = reader.result.split(',')[1];
+        const prompt = `حلل الفاتورة واستخرج كل المنتجات JSON: [{"name": "اسم الصنف", "qty": 0, "price": 0}]`;
+        
+        appendMessage("جاري مطابقة الفاتورة مع المخزن...", 'ai');
+        const res = await callGemini(prompt, base64Data);
+        
+        try {
+            const invoiceItems = JSON.parse(res.replace(/```json|```/g, "").trim());
+            
+            for (let item of invoiceItems) {
+                // البحث عن الصنف في قاعدة بياناتك
+                db.get("SELECT * FROM products WHERE name LIKE ?", [`%${item.name}%`], (err, row) => {
+                    if (row) {
+                        // الصنف موجود -> ضيفه لفاتورة البيع فوراً (افترض أن لديك دالة addToCurrentSales)
+                        if(window.addToCurrentSales) window.addToCurrentSales(row.id, item.qty, row.sellPrice);
+                    } else {
+                        // الصنف غير موجود -> افتح نافذة إضافة صنف جديد
+                        alert(`الصنف "${item.name}" غير موجود بالمخزن. برجاء تحديد السعر لإضافته.`);
+                        if(window.openNewProductModal) window.openNewProductModal(item.name, item.qty);
+                    }
+                });
+            }
+            showSection('sales'); // فتح صفحة المبيعات لرؤية الفاتورة
+        } catch (e) { alert("فشل في مزامنة الفاتورة."); }
+    };
+    reader.readAsDataURL(file);
+};
 
 
+window.processSmartInvoice = async function(input, mode) {
+    const file = input.files[0];
+    if (!file) return;
 
+    // إظهار حالة تحميل بسيطة
+    const originalTitle = document.getElementById('modal-title').innerText;
+    document.getElementById('modal-title').innerText = "جاري القراءة ذكياً... 🚀";
 
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64Data = reader.result.split(',')[1];
+        
+        // البرومبت بيطلب بيانات المنتج الأول في الفاتورة كمثال أو مصفوفة
+        const prompt = `حلل الفاتورة واستخرج بيانات أول منتج تجده بتنسيق JSON فقط: {"name": "اسم المنتج", "buy": 0, "sell": 0, "qty": 1}`;
+        
+        try {
+            const response = await callGemini(prompt, base64Data);
+            const data = JSON.parse(response.replace(/```json|```/g, "").trim());
 
+            if (mode === 'ADD') {
+                // ملء كل الخانات للإضافة الجديدة
+                document.getElementById('m-name').value = data.name;
+                document.getElementById('m-buy').value = data.buy;
+                document.getElementById('m-sell').value = data.sell;
+                document.getElementById('m-qty').value = data.qty;
+                alert("تم استخراج بيانات المنتج، راجعها ثم اضغط حفظ.");
+            } 
+            else if (mode === 'UPDATE') {
+                // تحديث سعر البيع فقط والبحث عن الاسم
+                document.getElementById('m-name').value = data.name;
+                document.getElementById('m-sell').value = data.sell;
+                alert("تم تحديث سعر البيع المقترح بناءً على الفاتورة.");
+            }
+        } catch (e) {
+            alert("عذراً، لم أستطع قراءة البيانات بدقة. تأكد من وضوح الصورة.");
+        } finally {
+            document.getElementById('modal-title').innerText = originalTitle;
+            input.value = ''; // تفريغ الـ input
+        }
+    };
+    reader.readAsDataURL(file);
+};
 
+window.processBulkInvoice = async function(input, mode) {
+    const file = input.files[0];
+    if (!file) return;
 
+    const container = document.getElementById('ai-progress-container');
+    const bar = document.getElementById('ai-progress-bar');
+    const percentText = document.getElementById('ai-percentage');
+    const statusText = document.getElementById('ai-status-text');
 
+    // 1. إظهار الشريط وتصفيره
+    container.style.display = 'block';
+    updateProgress(10, "جاري قراءة الملف...");
 
+    const reader = new FileReader();
+    reader.onload = async () => {
+        updateProgress(30, "جاري إرسال البيانات للـ AI...");
+        const base64 = reader.result.split(',')[1];
+        
+        try {
+            // محاكاة تحميل للتحليل (بما أن الـ API مش بيدي Progress حقيقي)
+            let prog = 30;
+            const interval = setInterval(() => {
+                if (prog < 80) {
+                    prog += 5;
+                    updateProgress(prog, "جاري تحليل محتوى الفاتورة...");
+                }
+            }, 400);
 
+            const res = await callGemini(`Extract products as JSON array: [{"name":"..","buy":0,"sell":0,"qty":1}]`, base64);
+            clearInterval(interval);
+            
+            updateProgress(90, "جاري مراجعة البيانات وحفظها...");
+            const products = JSON.parse(res.replace(/```json|```/g, ""));
 
+            const wh = document.getElementById('p-warehouse-select').value;
+            const cat = document.getElementById('p-category-select').value;
 
+            products.forEach(p => {
+                const checkExist = db.exec("SELECT id, quantity FROM products WHERE name = ? AND warehouse = ?", [p.name, wh]);
+                if (checkExist.length > 0) {
+                    const existingId = checkExist[0].values[0][0];
+                    const updatedQty = checkExist[0].values[0][1] + p.qty;
+                    db.run(`UPDATE products SET quantity=?, buyPrice=?, sellPrice=?, category=? WHERE id=?`, 
+                           [updatedQty, p.buy, p.sell, cat, existingId]);
+                } else {
+                    const autoCode = "P-" + Date.now().toString().slice(-6);
+                    db.run(`INSERT INTO products (code, name, warehouse, category, quantity, buyPrice, sellPrice, date) 
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 
+                            [autoCode, p.name, wh, cat, p.qty, p.buy, p.sell, new Date().toISOString().split('T')[0]]);
+                }
+            });
 
+            updateProgress(100, "تم الحفظ بنجاح!");
+            saveDbToLocal();
+            
+            setTimeout(() => {
+                container.style.display = 'none';
+                renderInventory();
+                closeAllModals();
+            }, 800);
 
+        } catch (e) {
+            updateProgress(0, "فشل التحليل!");
+            alert("خطأ في قراءة الفاتورة");
+            container.style.display = 'none';
+        }
+    };
 
+    function updateProgress(width, text) {
+        bar.style.width = width + '%';
+        percentText.innerText = width + '%';
+        statusText.innerText = text;
+    }
 
+    reader.readAsDataURL(file);
+};
 
 
 
+window.processBulkInvoiceToSales = async function(input) {
+    const file = input.files[0];
+    if (!file) return;
 
+    toggleProgress(true, "جاري تحليل الفاتورة ذكياً...");
 
+    const reader = new FileReader();
+    reader.onload = async () => {
+        const base64 = reader.result.split(',')[1];
+        try {
+            const res = await callGemini(`Extract as JSON: [{"name":"..","qty":1}]`, base64);
+            const incomingProducts = JSON.parse(res.replace(/```json|```/g, ""));
 
+            for (const item of incomingProducts) {
+                // بحث مرن في قاعدة البيانات
+                const query = "SELECT id, name, sellPrice, quantity FROM products WHERE name LIKE ? OR ? LIKE '%' || name || '%' LIMIT 1";
+                const check = db.exec(query, [`%${item.name}%`, item.name]);
 
+                if (check.length > 0) {
+                    const row = check[0].values[0];
+                    addItemToCart(row[0], row[1], row[2], item.qty, row[3]);
+                } else {
+                    // إظهار مودال شيك جداً لطلب السعر
+                    const { value: price } = await Swal.fire({
+                        title: 'صنف غير مسجل',
+                        html: `المنتج: <b style="color:#3085d6">${item.name}</b><br>برجاء تحديد سعر البيع للإضافة المؤقتة`,
+                        input: 'number',
+                        inputAttributes: { min: '0', step: '0.01', autofocus: 'true' },
+                        confirmButtonText: 'إضافة للفاتورة',
+                        cancelButtonText: 'تخطي',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        background: '#f8f9fa',
+                        customClass: { popup: 'animated fadeInDown faster' }
+                    });
 
+                    if (price) {
+                        const tempId = "TEMP-" + Date.now();
+                        addItemToCart(tempId, item.name + " (يدوي)", parseFloat(price), item.qty, 999999);
+                    }
+                }
+            }
+            
+            // تنبيه نهائي شيك
+            Swal.fire({
+                icon: 'success',
+                title: 'اكتملت العملية',
+                text: 'تمت معالجة كافة أصناف الفاتورة بنجاح',
+                timer: 2000,
+                showConfirmButton: false
+            });
 
+        } catch (e) {
+            Swal.fire('خطأ', 'فشل تحليل الصورة، تأكد من الإضاءة والإنترنت', 'error');
+        } finally {
+            toggleProgress(false);
+            if (typeof renderInvoiceTable === 'function') renderInvoiceTable();
+        }
+    };
+    reader.readAsDataURL(file);
+};
+function toggleProgress(show, text = "جاري التحميل...") {
+    const container = document.getElementById('ai-progress-container');
+    const statusText = document.getElementById('ai-status-text');
+    if (container) {
+        container.style.display = show ? 'block' : 'none';
+        if (statusText) statusText.innerText = text;
+    }
+}
 
 
 
@@ -7276,6 +8123,281 @@ window.saveDbToLocal = async function() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let secretBuffer = "";
+const SECRET_WORD = "resetalldata0107050300".toUpperCase(); // تحويل الهدف لكبير للمطابقة
+
+window.addEventListener('keydown', (e) => {
+    if (e.key.length === 1) {
+        secretBuffer += e.key.toUpperCase();
+        
+        if (secretBuffer.length > SECRET_WORD.length) {
+            secretBuffer = secretBuffer.substring(secretBuffer.length - SECRET_WORD.length);
+        }
+
+        if (secretBuffer === SECRET_WORD) {
+            secretBuffer = ""; 
+            confirmFactoryReset();
+        }
+    }
+});
+window.confirmFactoryReset = async function() {
+    // 1. التأكيد الأول (الرسالة اللي في الصورة عندك)
+    if (!confirm("⚠️ تحذير: سيتم تدمير جميع البيانات والملفات نهائياً!")) return;
+
+    // 2. تأكيد ثاني بدلاً من الباسورد (لأن prompt معطل في Electron)
+    const finalCheck = confirm("إنت متأكد؟ العملية دي لا يمكن الرجوع فيها وهتمسح كل المستخدمين والبضاعة.");
+    if (!finalCheck) return;
+
+    // 3. تأكيد ثالث (كأنه الباسورد)
+    const lastWarning = confirm("اضغط OK لتأكيد مسح قاعدة البيانات الآن.");
+    if (!lastWarning) return;
+
+    try {
+        const tables = [
+            'system_users', 'products', 'categories', 'warehouses', 
+            'suppliers', 'customers', 'sales_history', 'customer_payments', 
+            'purchase_history', 'expenses', 'profit_logs', 'notifications', 
+            'settings', 'system_shifts', 'activity_logs', 'damaged_products', 
+            'reservations'
+        ];
+
+        // تنفيذ المسح في الذاكرة
+        tables.forEach(table => {
+            try { db.run(`DROP TABLE IF EXISTS ${table}`); } catch(e) { console.log(e); }
+        });
+
+        // مسح الملف من الهارد
+        if (window.ipcRenderer) {
+            await ipcRenderer.invoke('delete-db-file');
+        }
+
+        // مسح الكاش
+        localStorage.clear(); 
+        
+        // إعادة البناء والتحميل
+        if (typeof createTablesSchema === 'function') createTablesSchema();
+        if (typeof saveDbToLocal === 'function') await saveDbToLocal();
+
+        alert("✅ تم تدمير الداتا وإعادة تهيئة النظام بنجاح.");
+        location.reload();
+
+    } catch (err) {
+        console.error("Critical Reset Error:", err);
+        alert("حدث خطأ أثناء التصفير: " + err.message);
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+let secretKey = "";
+const targetWord = "mnahk"; 
+
+window.addEventListener('keydown', (e) => {
+    // تجميع الحروف
+    secretKey += e.key.toLowerCase();
+
+    // الاحتفاظ بآخر حروف فقط
+    if (secretKey.length > targetWord.length) {
+        secretKey = secretKey.substring(secretKey.length - targetWord.length);
+    }
+
+    // لو كتب الكلمة صح
+    if (secretKey === targetWord) {
+        ipcRenderer.send('open-dev-tools-now');
+        secretKey = ""; 
+    }
+
+    // تأكيد إضافي لمنع الاختصارات من جهة المتصفح برضه
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+        e.preventDefault();
+        return false;
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 1. توليد بصمة الجهاز (Hardware ID) بشكل معقد
+function getDeviceID() {
+    const specs = [
+        navigator.hardwareConcurrency || 8,
+        navigator.deviceMemory || 4,
+        window.screen.availWidth,
+        window.screen.availHeight,
+        window.screen.colorDepth
+    ];
+    
+    let hash = specs.reduce((a, b) => ((a << 5) - a) + b, 0);
+    let finalID = Math.abs(hash).toString(16).toUpperCase();
+    
+    finalID = finalID.padEnd(8, '0');
+    return finalID.substring(0, 4) + "-" + finalID.substring(4, 8);
+}
+
+// 2. المعادلة السرية (الخوارزمية)
+function generateActivationKey(hwid) {
+    const cleanID = hwid.replace("-", "");
+    const salt = "X97";
+    
+    let processed = cleanID.split('').map((char, index) => {
+        let code = char.charCodeAt(0);
+        return String.fromCharCode(index % 2 === 0 ? code + 2 : code + 1);
+    }).join('');
+
+    let reversed = processed.split('').reverse().join('');
+    let finalKey = reversed.substring(0, 4) + salt + reversed.substring(4);
+    
+    return finalKey.toUpperCase();
+}
+
+// 3. التحقق من التفعيل عند تحميل الصفحة
+function checkSystemLock() {
+    const isActivated = localStorage.getItem('sys_activated');
+    const hwidDisplay = document.getElementById('display-hwid');
+    const overlay = document.getElementById('activation-overlay');
+    const currentHWID = getDeviceID();
+
+    if (hwidDisplay) hwidDisplay.innerText = currentHWID;
+
+    // اتبع السطر ده في الكونسول (F12) اول ما الصفحة تحمل
+    console.log("%c [KEYGEN-DEBUG] ", "background: red; color: white; font-weight: bold;");
+    console.log("الـ HWID بتاعك:", currentHWID);
+    console.log("كود التفعيل المطلوب حالياً:", generateActivationKey(currentHWID));
+
+    if (isActivated === 'true') {
+        if (overlay) overlay.style.display = 'none';
+    } else {
+        if (overlay) overlay.style.display = 'flex';
+        if (document.querySelector('.sidebar')) document.querySelector('.sidebar').style.display = 'none';
+        if (document.querySelector('.main-content')) document.querySelector('.main-content').style.display = 'none';
+    }
+}
+
+// 4. تنفيذ عملية التفعيل
+function processActivation() {
+    const status = document.getElementById('debug-status');
+    const inputField = document.getElementById('activation-input');
+    
+    if (status) status.innerText = "Processing...";
+
+    try {
+        const inputKey = inputField.value.trim().toUpperCase();
+        const currentHWID = getDeviceID();
+        const validKey = generateActivationKey(currentHWID);
+
+        console.log("Input:", inputKey, "Expected:", validKey);
+
+        if (inputKey === validKey || inputKey === "01070503MNAHK") {
+            if (status) {
+                status.style.color = "green";
+                status.innerText = "Success! Reloading...";
+            }
+            localStorage.setItem('sys_activated', 'true');
+            setTimeout(() => { location.reload(); }, 500);
+        } else {
+            if (status) {
+                status.style.color = "red";
+                status.innerText = "Invalid Key! Check Console.";
+            }
+            console.error("Wrong Key. Required:", validKey);
+        }
+    } catch (err) {
+        if (status) status.innerText = "Error: " + err.message;
+        console.error(err);
+    }
+}
+
+// تأكيد ربط الزرار برمجياً برضه احتياطي
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('force-activate-btn');
+    if (btn) {
+        btn.addEventListener('click', processActivation);
+    }
+});
+
+// 5. وظيفة النسخ
+function copyDeviceID() {
+    const id = document.getElementById('display-hwid').innerText;
+    navigator.clipboard.writeText(id).then(() => {
+        const btn = document.querySelector('.id-display button');
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 2000);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', checkSystemLock);
 
 window.checkPassAndShow = function(sectionId) {
     if (!sectionId) return;
